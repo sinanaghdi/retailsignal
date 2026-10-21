@@ -135,19 +135,24 @@ Follow `powerbi/README.md`. Use CSV marts under `data\processed\` and `data\mart
 - **Foreign-key insert failure:** confirm dimension inserts were run before line facts and inspect blank or inconsistent identifiers.
 - **Power BI totals differ:** check filter context, relationships, duplicated many-to-many joins, currency, and whether negative lines are added twice.
 
-## Publish to GitHub after validation
+## GitHub repository and future updates
 
-A remote repository has not been created by this build. In GitHub, create an empty public repository named `retailsignal` under your account (do not auto-add a README, license, or `.gitignore`; these already exist locally). Then run from the project root:
+The public repository is already available at [github.com/sinanaghdi/retailsignal](https://github.com/sinanaghdi/retailsignal). Clone it to get the canonical history:
 
 ```powershell
-git init
-git branch -M main
-git status --short
-git add .
-git status --short  # Verify raw/processed datasets and .env are absent
-git commit -m "Build RetailSignal retail analytics portfolio project"
-git remote add origin https://github.com/sinanaghdi/retailsignal.git
-git push -u origin main
+git clone https://github.com/sinanaghdi/retailsignal.git
+Set-Location retailsignal
+git status
 ```
 
-If Git reports the remote already exists, inspect `git remote -v` before changing it. If the remote has an initial commit, fetch and reconcile it instead of force-pushing. Confirm that generated data files and any real `.env` are ignored by Git before publishing.
+For future work, edit files in that clone, run the relevant tests, check that the raw workbook, generated outputs, and `.env` are absent from the staged changes, and publish a normal commit:
+
+```powershell
+git status --short
+git add src tests sql docs reports notebooks powerbi presentation README.md
+git status --short
+git commit -m "Describe the verified change"
+git push
+```
+
+Do not initialize a separate repository and force-push it over the existing project history. The archive's `scripts/publish_to_github.ps1` helper now explicitly refuses to create a parallel history and points to this clone-first workflow.
