@@ -1,0 +1,26 @@
+# Local environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.env
+
+# Source data and generated analytical outputs (do not commit the large raw workbook)
+data/raw/*
+data/processed/*
+data/marts/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/marts/.gitkeep
+
+# Local editor/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Power BI cache/lock files
+*.pbix.autosave
+~$*.pbix
