@@ -1,24 +1,28 @@
 # Phase 3 Implementation Report — RetailSignal
 
 **Repository:** https://github.com/sinanaghdi/retailsignal  
-**Default branch:** main  
-**Change:** PR #1 merged to main. KPI numerator/denominator contracts and additional synthetic fixture tests are present.
+**Phase 3 PR:** https://github.com/sinanaghdi/retailsignal/pull/1 (merged to `main`).
 
-## Files added
-- docs/kpi_contracts.md — metric grain, numerator, denominator, eligibility and caveats for sales, invoice, customer, cohort and data-quality KPIs.
-- tests/test_kpi_contracts_phase3.py — synthetic-fixture tests for distinct-invoice AOV, cancellations/positive sales separation, and cohort-month-zero behavior.
-- implementation_report.md — current evidence and release blockers.
+## Implemented
+- Added `docs/kpi_contracts.md` with metric grain, formulas, numerator/denominator, eligibility and caveats for recorded line values, eligible positive sales, distinct invoices/AOV, repeat-purchaser rate, cohort retention, RFM and quality rates.
+- Added `tests/test_kpi_contracts_phase3.py` with synthetic-fixture checks for distinct-invoice AOV, cancellation-line treatment, and cohort month zero.
+- Updated this report with observed GitHub Actions evidence and explicit release blockers.
 
-## Verification evidence
-- PR branch GitHub Actions: https://github.com/sinanaghdi/retailsignal/actions/runs/39688257161 — successful.
-- Post-merge main GitHub Actions: https://github.com/sinanaghdi/retailsignal/actions/runs/39688653194 — successful.
-- Those CI runs are the evidence for the tests; a fresh local clone/test run was not possible from this execution environment because direct GitHub network cloning was unavailable.
+## Test evidence
+- Branch workflow: https://github.com/sinanaghdi/retailsignal/actions/runs/39688257161 — success.
+- Post-merge main workflow: https://github.com/sinanaghdi/retailsignal/actions/runs/39688653194 — success.
+- The report-update commit also passed main CI: https://github.com/sinanaghdi/retailsignal/actions/runs/39690690826 — success.
+- CI logs show **39 passed** on Python 3.12 and **39 passed** on Python 3.13. There were 10 NumPy/Pandas deprecation warnings from date-offset handling in the existing pipeline; tests still passed.
+- A fresh local clone/test run was unavailable in this execution environment; CI output above is the current execution evidence.
 
-## Release blockers still open
-- Official UCI Online Retail II workbook download, checksum, worksheet/schema/row-count gate and end-to-end real-data analysis are pending.
-- PostgreSQL-specific SQL has not been validated against a running PostgreSQL service in this phase.
-- No Power BI PBIX was created or reviewed; screenshots of a Power BI report are not claimed.
-- All fixture numbers are synthetic and cannot be represented as real e-commerce findings. Do not publish sales/retention findings until the real-data gate and SQL/Pandas reconciliation pass.
+## Existing assets
+The repository contains dataset acquisition/schema inspection, row-preserving audit, cleaning flags, analytical marts, SQL scripts, notebooks, dashboard design assets and previous tests. Synthetic fixture values are for software testing only.
+
+## Release blockers
+- Official UCI Online Retail II download, file checksum, workbook/sheet/schema/row-count gate and end-to-end analysis on the real workbook have not been executed in this phase.
+- PostgreSQL-specific SQL has not been run against PostgreSQL in this phase.
+- No Power BI `.pbix` was created or reviewed.
+- Do not publish actual business conclusions on revenue, customer retention, or cohorts until the real-data gate and SQL/Pandas reconciliation pass.
 
 ## Status
-The KPI contract/test change is merged. The repository is improved but real-data validation and dashboard reconciliation remain prerequisites before publishing business conclusions.
+The KPI contract/test change is merged and CI-tested. This improves metric semantics, but real-data validation and dashboard reconciliation remain prerequisites before making business claims.
