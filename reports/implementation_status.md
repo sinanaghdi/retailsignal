@@ -44,8 +44,8 @@ The synthetic CLI fixture's signed line value was GBP 146.50. This is **only a s
 - No actual Online Retail II totals, data-quality counts, cohorts, RFM summaries, statistical results, or evidence-backed recommendations have been generated.
 - PostgreSQL execution is pending. `psql` and `pg_isready` are not installed in this environment, and no live server is configured. SQL contract tests and statement splitting are not substitutes for a live database run.
 - Power BI Desktop is unavailable; no `.pbix` file or real-data screenshot is included.
-- GitHub returned 404 for `sinanaghdi/retailsignal`; available connected GitHub actions do not include repository creation. No remote push has occurred.
-- The GitHub Actions workflow is committed to the local source bundle but has not run on GitHub because the repository has not been created/published.
+- The public repository `sinanaghdi/retailsignal` has been initialized and the project source/documentation committed to `main` through the connected GitHub integration. Raw data, generated analytical outputs, and `.env` credentials are excluded by `.gitignore`.
+- The GitHub Actions workflow is present on `main`; its first remote run/status has not yet been verified.
 
 ## Exact acceptance path from here
 
@@ -55,4 +55,4 @@ The synthetic CLI fixture's signed line value was GBP 146.50. This is **only a s
 4. Run `python -m pytest -q`, then initialize PostgreSQL and execute the schema, transformations, and all analytical SQL scripts.
 5. Reconcile Python and PostgreSQL totals under identical eligibility definitions, then create and validate the Power BI report against those outputs.
 6. Replace pending findings and recommendation hypotheses only after their values, denominators, time periods, sensitivities, and limitations are reviewed.
-7. Create the public GitHub repository and push the source bundle. Confirm raw/processed data and `.env` are not staged; then verify CI and README links on GitHub.
+7. Verify the GitHub Actions result and README links on the published repository. Confirm raw/processed data and `.env` remain absent from the remote tree.
