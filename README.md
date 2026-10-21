@@ -130,7 +130,7 @@ retailsignal/
 ## Validation status
 
 - **Implemented:** pipeline modules, SQL scripts, metric definitions, Power BI specification, report templates, notebook skeletons, synthetic tests.
-- **Executed:** 29 automated tests pass in the current recorded run, including synthetic pipeline, workbook schema-gate, and notebook-structure checks (see [`reports/implementation_status.md`](reports/implementation_status.md)).
+- **Executed:** 36 automated tests passed in the recorded local validation run, including synthetic pipeline, workbook schema-gate, and notebook-structure checks (see [`reports/implementation_status.md`](reports/implementation_status.md)).
 - **Pending:** official workbook acquisition and schema inspection, real-data execution, SQL execution against PostgreSQL, Power BI build/verification, findings and recommendations.
 
 Do not convert a pending item into a portfolio claim until its evidence has been generated and reviewed. For implementation gaps and release criteria, see [`reports/limitations.md`](reports/limitations.md).
@@ -140,12 +140,20 @@ Do not convert a pending item into a portfolio claim until its evidence has been
 `data-analysis`, `sql`, `python`, `pandas`, `postgresql`, `power-bi`, `customer-retention`, `cohort-analysis`, `rfm-analysis`, `e-commerce-analytics`, `business-intelligence`
 
 
-## Publish to GitHub
+## Repository and local development
 
-To publish this project under `sinanaghdi/retailsignal` from Windows, install Git and the [GitHub CLI](https://cli.github.com/), then authenticate with `gh auth login`. Open PowerShell in the extracted project root and run:
+This project is published at **[github.com/sinanaghdi/retailsignal](https://github.com/sinanaghdi/retailsignal)**.
+
+To work on the project locally, clone the existing repository rather than initializing a separate Git history:
 
 ```powershell
-.\scripts\publish_to_github.ps1
+git clone https://github.com/sinanaghdi/retailsignal.git
+Set-Location retailsignal
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-The script creates a public repository if it does not exist, commits the project with your authenticated GitHub identity, and pushes without force-overwriting existing remote history. If the remote already contains commits, the script stops and asks you to reconcile the histories. Raw data, generated analytical outputs, and `.env` files are excluded by `.gitignore`.
+After a change, run the relevant tests, inspect `git status` to confirm no raw workbook, generated customer-level exports, or `.env` file is staged, then commit and push your branch. The `scripts/publish_to_github.ps1` bootstrap helper intentionally refuses to create a parallel history; use the existing clone for subsequent work.
+
+**Publication boundary:** source code, documentation, SQL, notebooks, and synthetic unit fixtures are versioned. The official workbook and generated analytical outputs remain local and are excluded by `.gitignore`. Real-data findings, live PostgreSQL validation, and the Power BI `.pbix` remain pending.
