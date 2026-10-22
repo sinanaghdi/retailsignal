@@ -1,9 +1,11 @@
 """End-to-end audit of the official UCI Online Retail II data; emits aggregate evidence only."""
 from __future__ import annotations
-import argparse, hashlib, json
+import argparse, hashlib, json, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 from src.config import DEFAULT_WORKBOOK, DEFAULT_INGESTED, DEFAULT_CLEANED, MARTS_DIR, PROCESSED_DIR, RAW_DIR
 from src.download_data import download_uci_workbook
 from src.ingest import ingest_workbook
