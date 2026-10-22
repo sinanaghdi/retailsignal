@@ -42,12 +42,8 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
       - name: Download, ingest, audit, clean and calculate on official UCI data
-        run: |
-          python -m src.download_data
-          python -m src.ingest
-          python -m src.clean
-          python -m src.statistics
-          python scripts/validate_real_dataset.py --output data/processed/real_dataset_validation.json
+        # The validation script orchestrates these steps itself; don't run the 1M-row pipeline twice.
+        run: python scripts/validate_real_dataset.py --output data/processed/real_dataset_validation.json
       - name: Load all source rows into PostgreSQL staging
         run: python -m src.load_postgres --init-schema --chunk-size 10000
       - name: Execute PostgreSQL transformation and analytical SQL
