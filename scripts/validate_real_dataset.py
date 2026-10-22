@@ -9,7 +9,7 @@ from src.download_data import download_uci_workbook
 from src.ingest import ingest_workbook
 from src.clean import run_clean
 from src.statistics import run_statistical_checks
-from src.validate import audit_dataframe, inspect_workbook if False else audit_dataframe
+
 
 EXPECTED_ROWS = 1_067_371
 DATASET_URL = "https://archive.ics.uci.edu/dataset/502/online+retail+ii"
