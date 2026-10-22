@@ -129,11 +129,10 @@ retailsignal/
 
 ## Validation status
 
-- **Executed on the official source:** UCI Online Retail II was downloaded, both worksheets passed schema inspection, all 1,067,371 rows were ingested and retained in the cleaned fact output, 15 analytical marts were generated, and statistical checks ran. See [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md) for the actual aggregate results and limitations.
-- **Automated tests:** 36 tests passed in the prior recorded local validation; after real-data regressions were added, the Python 3.12 and 3.13 CI matrix also passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39745289973).
-- **Passed end-to-end:** the official 1,067,371-row workbook loaded into PostgreSQL staging and fact with no row loss; SQL 02–07 executed; signed GBP value and eligible positive sales matched between Python and PostgreSQL; all 7 PostgreSQL reconciliation checks and all 10 source acceptance checks passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309).
-- **41 automated tests:** the Python 3.12 and Python 3.13 matrix passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39746559724).
-- **Still pending:** Power BI build/visual verification and final evidence-backed business interpretation.
+- **Real source executed:** UCI Online Retail II; 1,067,371 source rows preserved and 15 analytical marts generated. See [the real-data report](reports/real_dataset_benchmark.md).
+- **Automated tests:** 41 tests passed on Python 3.12 and 41 on Python 3.13 in [CI run 39748609139](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609139).
+- **End-to-end acceptance:** PostgreSQL 16 staging/fact totals and eligible positive sales reconciled; SQL files 02–07 executed; 7 PostgreSQL checks and 10 source checks passed. In addition, the top 10 product results were compared across 7 fields per product between Python and PostgreSQL, with 10/10 rows matched and no mismatches in [CI run 39748609227](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227).
+- **Still pending:** build and visual verification of the Power BI `.pbix` file. Real-data analysis is descriptive and does not prove causal or commercial impact.
 
 Do not convert a pending item into a portfolio claim until its evidence has been generated and reviewed. For implementation gaps and release criteria, see [`reports/limitations.md`](reports/limitations.md).
 

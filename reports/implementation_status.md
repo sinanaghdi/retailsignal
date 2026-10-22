@@ -46,9 +46,9 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 - Positive invoice count matches at 40,077 and no cancellation-prefixed invoice row is classified as positive sales.
 - All 7 PostgreSQL reconciliation checks, all 10 real-data acceptance checks, and the additional top-10 parity check passed. The top 10 products matched Python vs PostgreSQL across 7 fields per product with no mismatches.
 
-The live dataset run exposed two product-query defects: reading description from fact_sales_line (a column that does not exist there) and selecting a label from a generic dimension that could differ from the most frequent description among positive-sale lines. The current query uses source descriptions joined through source_row_id and ranks the mode description; a real-data acceptance check compares top-10 labels and metrics with Python. The initial workflow also ran the million-row pipeline twice; that duplicate work has been removed.
+The live dataset run exposed two product-query defects: reading description from fact_sales_line (a column that does not exist there) and selecting a label from a generic dimension that could differ from the most frequent description among positive-sale lines. The current query uses source descriptions joined through source_row_id and ranks the mode description; the latest successful real-data acceptance check compared top-10 labels and metrics with Python, with no mismatches. The initial workflow also ran the million-row pipeline twice; that duplicate work has been removed.
 
-Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309/artifacts/12411209912).
+Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227/artifacts/12412073337).
 
 ## Not executed / not claimed
 
