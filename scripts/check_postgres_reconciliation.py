@@ -4,10 +4,14 @@ import argparse
 import json
 import math
 import os
+import sys
 from pathlib import Path
 
 import pandas as pd
 import psycopg
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 from src.config import MARTS_DIR
 
 
@@ -119,7 +123,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--summary", type=Path, default=Path("data/processed/real_dataset_validation.json"))
     args = parser.parse_args()
-    root = Path(__file__).resolve().parents[1]
+    root = PROJECT_ROOT
     summary = json.loads((root / args.summary).read_text(encoding="utf-8"))
     dsn = os.environ.get("DATABASE_URL", "").replace("postgresql+psycopg://", "postgresql://", 1)
     if not dsn:
