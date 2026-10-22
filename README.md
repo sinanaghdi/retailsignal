@@ -129,9 +129,10 @@ retailsignal/
 
 ## Validation status
 
-- **Implemented:** pipeline modules, SQL scripts, metric definitions, Power BI specification, report templates, notebook skeletons, synthetic tests.
-- **Executed:** 36 automated tests passed in the recorded local validation run, including synthetic pipeline, workbook schema-gate, and notebook-structure checks (see [`reports/implementation_status.md`](reports/implementation_status.md)).
-- **Pending:** official workbook acquisition and schema inspection, real-data execution, SQL execution against PostgreSQL, Power BI build/verification, findings and recommendations.
+- **Executed on the official source:** UCI Online Retail II was downloaded, both worksheets passed schema inspection, all 1,067,371 rows were ingested and retained in the cleaned fact output, 15 analytical marts were generated, and statistical checks ran. See [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md) for the actual aggregate results and limitations.
+- **Automated tests:** 36 tests passed in the prior recorded local validation; after real-data regressions were added, the Python 3.12 and 3.13 CI matrix also passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39745289973).
+- **In verification:** the current full acceptance workflow is rerunning after an import-path fix and checks PostgreSQL staging, SQL transformations, and reconciliation. See [the end-to-end run](https://github.com/sinanaghdi/retailsignal/actions/runs/39745289968). Do not claim PostgreSQL reconciliation or a verified Power BI build until that run succeeds.
+- **Still pending:** Power BI build/visual verification and final evidence-backed business interpretation.
 
 Do not convert a pending item into a portfolio claim until its evidence has been generated and reviewed. For implementation gaps and release criteria, see [`reports/limitations.md`](reports/limitations.md).
 
@@ -156,4 +157,4 @@ pip install -r requirements.txt
 
 After a change, run the relevant tests, inspect `git status` to confirm no raw workbook, generated customer-level exports, or `.env` file is staged, then commit and push your branch. The `scripts/publish_to_github.ps1` bootstrap helper intentionally refuses to create a parallel history; use the existing clone for subsequent work.
 
-**Publication boundary:** source code, documentation, SQL, notebooks, and synthetic unit fixtures are versioned. The official workbook and generated analytical outputs remain local and are excluded by `.gitignore`. Real-data findings, live PostgreSQL validation, and the Power BI `.pbix` remain pending.
+**Publication boundary:** source code, documentation, SQL, notebooks, and synthetic unit fixtures are versioned. The official workbook and generated analytical outputs remain local and are excluded by `.gitignore`. The official raw workbook and generated transaction/customer-level outputs remain excluded by `.gitignore`. Aggregate real-data findings are documented; final PostgreSQL acceptance and Power BI `.pbix` verification remain pending until evidence is confirmed.
