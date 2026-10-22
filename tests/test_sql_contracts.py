@@ -45,3 +45,12 @@ def test_sql_statement_splitter_respects_quotes_and_comments():
     assert len(statements) == 2
     assert "'a;b'" in statements[0]
     assert "SELECT 2" in statements[1]
+
+
+def test_product_sql_gets_description_from_dimension_not_fact():
+    sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
+    product_cte = sql.split("), ranked AS", 1)[0]
+    assert "retailsignal.fact_sales_line AS f" in product_cte
+    assert "retailsignal.dim_product AS p" in product_cte
+    assert "MAX(p.description)" in product_cte
+    assert "f.description" not in product_cte
