@@ -4,7 +4,7 @@
 
 RetailSignal is a reproducible business analytics case study built around the UCI Machine Learning Repository's **Online Retail II** dataset. It is designed to show how a junior analyst can move from source-data inspection to transparent cleaning rules, reconciled SQL metrics, customer analytics, statistical checks, and an executive-facing Power BI design.
 
-> **Evidence status:** The project code and synthetic unit tests are implemented locally. The official workbook was not available in the build environment, so the real-data audit, analytical results, and business recommendations are intentionally marked **pending**. No real-data findings, dashboard screenshots, or business impact are claimed here.
+> **Evidence status:** The official UCI Online Retail II workbook has now been executed end-to-end in CI: all 1,067,371 source rows were preserved, 15 marts were generated, PostgreSQL 16 SQL executed, and Python/PostgreSQL financial totals reconciled. The top 10 product rows, including labels and KPIs, also match Python exactly. See [the real-data report](reports/real_dataset_benchmark.md). This historical dataset does not prove current market demand or business impact.
 
 ## Business questions
 
@@ -58,7 +58,7 @@ python -m pytest -q
 python -m src.statistics
 ```
 
-Project charter and acceptance criteria: [`docs/project_charter.md`](docs/project_charter.md). A [GitHub Actions workflow is configured](.github/workflows/tests.yml) for Python 3.12 and 3.13; it has not run remotely yet. The suite uses isolated software fixtures and does not download or validate the real UCI workbook. Detailed download, PostgreSQL, and Power BI instructions: [`docs/setup.md`](docs/setup.md), [`docs/architecture.md`](docs/architecture.md), and [`powerbi/README.md`](powerbi/README.md).
+Project charter and acceptance criteria: [`docs/project_charter.md`](docs/project_charter.md). The Python 3.12/3.13 suite passed with 41 tests each in [CI run 39748609139](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609139). The real UCI + PostgreSQL end-to-end workflow passed in [CI run 39748609227](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227), including 7 reconciliation checks, 10 source checks, and a 10-product × 7-field top-10 comparison between Python and PostgreSQL. Detailed evidence: [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md). Power BI `.pbix` build and visual verification remain pending. Instructions: [`docs/setup.md`](docs/setup.md), [`docs/architecture.md`](docs/architecture.md), and [`powerbi/README.md`](powerbi/README.md).
 
 ## Pipeline outputs
 
@@ -158,4 +158,4 @@ pip install -r requirements.txt
 
 After a change, run the relevant tests, inspect `git status` to confirm no raw workbook, generated customer-level exports, or `.env` file is staged, then commit and push your branch. The `scripts/publish_to_github.ps1` bootstrap helper intentionally refuses to create a parallel history; use the existing clone for subsequent work.
 
-**Publication boundary:** source code, documentation, SQL, notebooks, and synthetic unit fixtures are versioned. The official workbook and generated analytical outputs remain local and are excluded by `.gitignore`. The official raw workbook and generated transaction/customer-level outputs remain excluded by `.gitignore`. Aggregate real-data findings are documented; final PostgreSQL acceptance and Power BI `.pbix` verification remain pending until evidence is confirmed.
+**Publication boundary:** source code, documentation, SQL, notebooks, and synthetic unit fixtures are versioned. The official workbook and generated transaction/customer-level outputs are excluded by `.gitignore`. Aggregate real-data evidence and PostgreSQL reconciliation are documented in [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md); Power BI `.pbix` build and visual verification remain pending.
