@@ -37,13 +37,21 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 
 ## PostgreSQL end-to-end status
 
-The first real-data PostgreSQL execution successfully loaded all source rows to staging and ran transformation/analysis SQL files 02–05. Execution of SQL file 06 then exposed an actual schema bug: it attempted to read description from fact_sales_line, where that column does not exist. The query has been fixed to join retailsignal.dim_product for descriptions and now has a regression contract test.
+**End-to-end validation passed:** [GitHub Actions run 39746779309](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309).
 
-The end-to-end workflow is being rerun after the fix at [RetailSignal real-data validation](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309). Until the final run passes, do **not** claim the PostgreSQL analytical SQL and final Python/PostgreSQL aggregate reconciliation are fully accepted. The rerun workflow was also simplified to avoid invoking the same million-row ingestion/clean/statistics pipeline twice.
+- All 1,067,371 source rows were loaded in staging and retained in fact.
+- All SQL files 02–07 executed against PostgreSQL 16.15.
+- Signed totals reconcile: staging and fact both equal GBP 19,287,250.57.
+- Eligible positive line sales reconcile to GBP 20,972,594.57 in Python and PostgreSQL.
+- Positive invoice count matches at 40,077 and no cancellation-prefixed invoice row is classified as positive sales.
+- All 7 PostgreSQL reconciliation checks and all 10 real-data acceptance checks passed.
+
+The live dataset run exposed a real SQL defect: file 06 attempted to read description from fact_sales_line, where the column does not exist. The query now joins retailsignal.dim_product, with a regression contract test. The initial workflow also ran the million-row pipeline twice; that duplicate work has been removed.
+
+Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309/artifacts/12411209912).
 
 ## Not executed / not claimed
 
-- Latest end-to-end PostgreSQL SQL execution and final reconciliation have not yet been verified as successful.
 - No real-data Power BI PBIX was built or verified.
 - No business-impact or causal claim is established by these descriptive analyses.
 - The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
