@@ -1,0 +1,73 @@
+name: RetailSignal real-data end-to-end validation
+on:
+  push:
+    paths:
+      - "src/**"
+      - "sql/**"
+      - "scripts/validate_real_dataset.py"
+      - "scripts/check_postgres_reconciliation.py"
+      - ".github/workflows/real-data-validation.yml"
+      - "requirements.txt"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-data-pipeline:
+    name: UCI Online Retail II + PostgreSQL reconciliation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: retailsignal
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d retailsignal"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/retailsignal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Download, ingest, audit, clean and calculate on official UCI data
+        run: |
+          python -m src.download_data
+          python -m src.ingest
+          python -m src.clean
+          python -m src.statistics
+          python scripts/validate_real_dataset.py --output data/processed/real_dataset_validation.json
+      - name: Load all source rows into PostgreSQL staging
+        run: python -m src.load_postgres --init-schema --chunk-size 10000
+      - name: Execute PostgreSQL transformation and analytical SQL
+        run: |
+          for file in sql/02_transformations.sql sql/03_sales_analysis.sql sql/04_customer_analysis.sql sql/05_cohort_analysis.sql sql/06_product_and_country_analysis.sql sql/07_data_quality_checks.sql; do
+            echo "===== $file ====="
+            python -m src.run_sql --file "$file" --preview-rows 5
+          done
+      - name: Reconcile PostgreSQL with Python real-data totals
+        run: python scripts/check_postgres_reconciliation.py --summary data/processed/real_dataset_validation.json
+      - name: Upload aggregate validation evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retailsignal-uci-online-retail-ii-validation
+          path: |
+            data/processed/real_dataset_validation.json
+            data/processed/postgres_real_data_reconciliation.json
+            data/processed/data_quality_audit.csv
+            data/processed/statistical_checks.json
+            data/raw/source_manifest.json
+          if-no-files-found: warn
+          retention-days: 14
