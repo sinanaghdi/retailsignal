@@ -1,58 +1,54 @@
 # Implementation Status and Validation Evidence
 
-**Last local validation:** 2026-10-21
+**Last checked:** 2026-10-22
 
 ## Implemented
 
-- Project charter, architecture, source attribution, metric dictionary, limitations, setup guide, README, MIT code license, `.env.example`, and `.gitignore`.
-- Official UCI workbook downloader: streamed download, bounded retries, ZIP validation, extraction of only `online_retail_II.xlsx`, fail-fast schema inspection, SHA-256 manifest, and no-overwrite default.
+- Project charter, architecture, source attribution, metric dictionary, limitations, setup guide, README, MIT code license, .env.example, and .gitignore.
+- Official UCI workbook downloader: streamed download, bounded retries, ZIP validation, extraction of only online_retail_II.xlsx, fail-fast schema inspection, SHA-256 manifest, and no-overwrite default.
 - Canonical column normalization and multi-sheet ingestion with source-row IDs and no intentional row deletion.
 - Data-quality audit with counts/percentages and rationale for missing/blank values, exact duplicate candidates, invoice attribute variations, cancellation prefixes, negative quantities/values, invalid fields, line-value outliers, nonstandard stock codes, and customer-ID shape anomalies.
 - Row-preserving transaction cleaning, signed line values, defined positive-sale eligibility, customer-attribution ambiguity flags, and 15 generated analytical marts.
 - Python metrics for monthly sales, product/country performance, cancellation/negative-record diagnostics, repeat purchases, cohorts, RFM, customer concentration, duplicate sensitivity, and alternative RFM monetary definitions.
 - PostgreSQL staging schema, fact/dimension model, transformations, analytical queries, reconciliation checks, and Python SQL execution/loading utilities.
 - Three notebooks, five-page Power BI specification, DAX dictionary, interview walkthrough, LinkedIn drafts, case-study outline, and honest resume bullet templates.
-- GitHub Actions workflow configured for Python 3.12 and 3.13.
+- GitHub Actions unit tests and official-source + PostgreSQL end-to-end workflow.
 
-## Executed local checks
+## Executed on the official source
 
-| Check | Result | Scope |
-|---|---|---|
-| `python -m pytest -q` | **36 passed** | Unit tests, isolated synthetic fixtures, SQL/source contracts, downloader behavior, and notebook regression cell |
-| `python -m compileall -q src tests` | Passed | Python syntax compilation |
-| Notebook format validation | Passed | All 3 notebooks validated with `nbformat` |
-| Notebook execution | Passed | All 3 notebooks executed with no cell errors against local synthetic-only fixture outputs; results saved outside the project bundle |
-| Synthetic CLI pipeline | Passed | Ingest → audit → clean → statistics executed from command line using a 15-row synthetic workbook |
-| Synthetic row reconciliation | 15 input rows = 15 cleaned rows | No rows dropped in the test fixture |
-| Synthetic mart generation | 15 CSV marts | Output coverage check only |
-| Synthetic audit output | 28 metrics | Output coverage check only |
-| SQL statement splitting | 40 statements across 7 SQL files | Parser utility check only; not PostgreSQL execution |
-| Downloader success path | Passed using an in-memory test ZIP | Mocked network response; does not establish source availability |
+Source: [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii), DOI 10.24432/C5CG6D, CC BY 4.0.
 
-The synthetic CLI fixture's signed line value was GBP 146.50. This is **only a software reconciliation value from synthetic rows**, not a business finding and not a result from Online Retail II. The customer-group statistical comparison was correctly marked `not_tested` on the undersized fixture.
+The official workbook was downloaded in GitHub Actions. Schema inspection passed for both worksheets, Year 2009-2010 and Year 2010-2011. Ingest produced **1,067,371 rows**. Cleaning retained **1,067,371 rows** (no intentional row deletion).
 
-## Fixes discovered during validation
+Actual run output:
+- Signed recorded line value: **GBP 19,287,250.57**.
+- Gross positive eligible line sales: **GBP 20,972,594.57**.
+- 15 analytical marts were written.
+- Statistical check for January–November 2010 versus January–November 2011: 11 paired months, Wilcoxon signed-rank p=0.51953125; the test does not support a conventional p<0.05 claim of a paired-month difference.
+- Per-customer mean positive invoice value comparison: one-time purchasers n=1,623, median GBP 232.48; repeat purchasers n=4,255, median GBP 300.88; Mann–Whitney p=1.533525e-31, rank-biserial effect 0.1968. This is observational association, not causal evidence.
 
-1. Corrected the configured UCI archive endpoint to match the plus-separated filename on the official download link.
-2. Added `src.download_data` and tests for extraction, manifest hashing, invalid archives, existing-file handling, and transient retry behavior.
-3. Added `--input` and `--output-dir` CLI arguments to `src.statistics`; previously the module ignored supplied paths, causing a custom-path smoke run to fail.
-4. Fixed a notebook summary cell that mixed a Series and one-item list in a DataFrame constructor; added a focused regression test and re-executed all 3 notebooks.
+Detailed interpretation and source limitations: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md).
 
-## Not executed / blocked
+## Software tests
 
-- The official workbook has **not** been downloaded into this execution environment. Direct container access failed at DNS resolution, and the official download click request timed out. No real-data schema or transaction row has therefore been inspected here.
-- No actual Online Retail II totals, data-quality counts, cohorts, RFM summaries, statistical results, or evidence-backed recommendations have been generated.
-- PostgreSQL execution is pending. `psql` and `pg_isready` are not installed in this environment, and no live server is configured. SQL contract tests and statement splitting are not substitutes for a live database run.
-- Power BI Desktop is unavailable; no `.pbix` file or real-data screenshot is included.
-- The public repository `sinanaghdi/retailsignal` has been initialized and the project source/documentation committed to `main` through the connected GitHub integration. Raw data, generated analytical outputs, and `.env` credentials are excluded by `.gitignore`.
-- The GitHub Actions workflow is present on `main`; its first remote run/status has not yet been verified.
+- **41 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 39746559724](https://github.com/sinanaghdi/retailsignal/actions/runs/39746559724).
+- The new regression test confirms that missing product descriptions are quality defects but do not silently remove otherwise computable financial lines.
+- An additional SQL contract test checks product-description lookup through dim_product rather than the fact table.
 
-## Exact acceptance path from here
+## PostgreSQL end-to-end status
 
-1. On Windows, run `python -m src.download_data`. If the official endpoint remains unavailable, manually download the ZIP from the official UCI dataset page and place the original workbook at `data/raw/online_retail_II.xlsx`.
-2. Run `python -m src.ingest --inspect-only`, then `python -m src.ingest`, `python -m src.validate`, `python -m src.clean`, and `python -m src.statistics`.
-3. Inspect the generated audit before interpreting any business metric; retain the raw workbook and generated local source manifest outside Git.
-4. Run `python -m pytest -q`, then initialize PostgreSQL and execute the schema, transformations, and all analytical SQL scripts.
-5. Reconcile Python and PostgreSQL totals under identical eligibility definitions, then create and validate the Power BI report against those outputs.
-6. Replace pending findings and recommendation hypotheses only after their values, denominators, time periods, sensitivities, and limitations are reviewed.
-7. Verify the GitHub Actions result and README links on the published repository. Confirm raw/processed data and `.env` remain absent from the remote tree.
+The first real-data PostgreSQL execution successfully loaded all source rows to staging and ran transformation/analysis SQL files 02–05. Execution of SQL file 06 then exposed an actual schema bug: it attempted to read description from fact_sales_line, where that column does not exist. The query has been fixed to join retailsignal.dim_product for descriptions and now has a regression contract test.
+
+The end-to-end workflow is being rerun after the fix at [RetailSignal real-data validation](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309). Until the final run passes, do **not** claim the PostgreSQL analytical SQL and final Python/PostgreSQL aggregate reconciliation are fully accepted. The rerun workflow was also simplified to avoid invoking the same million-row ingestion/clean/statistics pipeline twice.
+
+## Not executed / not claimed
+
+- Latest end-to-end PostgreSQL SQL execution and final reconciliation have not yet been verified as successful.
+- No real-data Power BI PBIX was built or verified.
+- No business-impact or causal claim is established by these descriptive analyses.
+- The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
+- Raw workbook and customer-level files are excluded from public Git. CI artifacts are limited to aggregate metrics, quality summaries, and manifest details.
+
+## Data interpretation caveats
+
+Recorded transaction line amounts are not verified collected cash, recognized accounting revenue, gross margin, or profit. Cancellation prefixes, negative quantity, negative line value and exact-duplicate candidates can overlap and must not be summed as if they were disjoint categories. Repeated-purchase status and cohorts are subject to missing customer identifiers and unequal follow-up, especially around the final December 2011 coverage. Statistical comparisons are observational and do not establish causality.
