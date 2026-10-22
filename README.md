@@ -131,7 +131,8 @@ retailsignal/
 
 - **Executed on the official source:** UCI Online Retail II was downloaded, both worksheets passed schema inspection, all 1,067,371 rows were ingested and retained in the cleaned fact output, 15 analytical marts were generated, and statistical checks ran. See [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md) for the actual aggregate results and limitations.
 - **Automated tests:** 36 tests passed in the prior recorded local validation; after real-data regressions were added, the Python 3.12 and 3.13 CI matrix also passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39745289973).
-- **In verification:** the current full acceptance workflow is rerunning after an import-path fix and checks PostgreSQL staging, SQL transformations, and reconciliation. See [the end-to-end run](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309). Do not claim PostgreSQL reconciliation or a verified Power BI build until that run succeeds.
+- **Passed end-to-end:** the official 1,067,371-row workbook loaded into PostgreSQL staging and fact with no row loss; SQL 02–07 executed; signed GBP value and eligible positive sales matched between Python and PostgreSQL; all 7 PostgreSQL reconciliation checks and all 10 source acceptance checks passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39746779309).
+- **41 automated tests:** the Python 3.12 and Python 3.13 matrix passed in [this run](https://github.com/sinanaghdi/retailsignal/actions/runs/39746559724).
 - **Still pending:** Power BI build/visual verification and final evidence-backed business interpretation.
 
 Do not convert a pending item into a portfolio claim until its evidence has been generated and reviewed. For implementation gaps and release criteria, see [`reports/limitations.md`](reports/limitations.md).
