@@ -191,7 +191,10 @@ def build_product_performance(lines: pd.DataFrame) -> pd.DataFrame:
         gross_positive_line_sales_gbp=("line_value", "sum"),
         units_sold_positive=("quantity", "sum"),
         invoice_count=("invoice_no", "nunique"),
-    ).sort_values("gross_positive_line_sales_gbp", ascending=False).reset_index(drop=True)
+    ).sort_values(
+        ["gross_positive_line_sales_gbp", "stock_code"],
+        ascending=[False, True], kind="mergesort"
+    ).reset_index(drop=True)
     total = result["gross_positive_line_sales_gbp"].sum()
     result["sales_contribution_pct"] = result["gross_positive_line_sales_gbp"] / total * 100 if total else np.nan
     result["cumulative_contribution_pct"] = result["sales_contribution_pct"].cumsum()

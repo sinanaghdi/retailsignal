@@ -1,17 +1,34 @@
 -- 06 | Product and country performance, using eligible positive sales lines.
-WITH product_sales AS (
-    SELECT f.stock_code, MAX(p.description) AS description,
+WITH sales_description_counts AS (
+    -- Match the Python product mart: most common description among eligible positive-sales source rows.
+    SELECT f.stock_code, NULLIF(BTRIM(s.description), '') AS description, COUNT(*) AS description_rows
+    FROM retailsignal.fact_sales_line AS f
+    JOIN retailsignal.stg_online_retail AS s ON s.source_row_id = f.source_row_id
+    WHERE f.is_positive_sales_line
+      AND f.stock_code IS NOT NULL
+      AND NULLIF(BTRIM(s.description), '') IS NOT NULL
+    GROUP BY f.stock_code, NULLIF(BTRIM(s.description), '')
+), ranked_descriptions AS (
+    SELECT stock_code, description, description_rows,
+           ROW_NUMBER() OVER (
+               PARTITION BY stock_code
+               ORDER BY description_rows DESC, description COLLATE "C" ASC
+           ) AS label_rank
+    FROM sales_description_counts
+), product_sales AS (
+    SELECT f.stock_code, d.description,
            SUM(f.line_value) AS gross_positive_line_sales_gbp,
            SUM(f.quantity) AS positive_units,
            COUNT(DISTINCT f.invoice_no) AS invoice_count
     FROM retailsignal.fact_sales_line AS f
-    LEFT JOIN retailsignal.dim_product AS p ON p.stock_code = f.stock_code
+    LEFT JOIN ranked_descriptions AS d
+      ON d.stock_code = f.stock_code AND d.label_rank = 1
     WHERE f.is_positive_sales_line AND f.stock_code IS NOT NULL
-    GROUP BY f.stock_code
+    GROUP BY f.stock_code, d.description
 ), ranked AS (
     SELECT *, SUM(gross_positive_line_sales_gbp) OVER () AS total_sales,
-           ROW_NUMBER() OVER (ORDER BY gross_positive_line_sales_gbp DESC, stock_code) AS sales_rank,
-           SUM(gross_positive_line_sales_gbp) OVER (ORDER BY gross_positive_line_sales_gbp DESC, stock_code
+           ROW_NUMBER() OVER (ORDER BY gross_positive_line_sales_gbp DESC, stock_code COLLATE "C") AS sales_rank,
+           SUM(gross_positive_line_sales_gbp) OVER (ORDER BY gross_positive_line_sales_gbp DESC, stock_code COLLATE "C"
                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_sales
     FROM product_sales
 )

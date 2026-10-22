@@ -47,10 +47,13 @@ def test_sql_statement_splitter_respects_quotes_and_comments():
     assert "SELECT 2" in statements[1]
 
 
-def test_product_sql_gets_description_from_dimension_not_fact():
+def test_product_sql_uses_mode_description_from_positive_sales_lines():
     sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
     product_cte = sql.split("), ranked AS", 1)[0]
     assert "retailsignal.fact_sales_line AS f" in product_cte
-    assert "retailsignal.dim_product AS p" in product_cte
-    assert "MAX(p.description)" in product_cte
-    assert "f.description" not in product_cte
+    assert "retailsignal.stg_online_retail AS s" in product_cte
+    assert "s.source_row_id = f.source_row_id" in product_cte
+    assert "description_rows DESC, description COLLATE \"C\" ASC" in product_cte
+    assert "MAX(p.description)" not in product_cte
+    assert "GROUP BY f.stock_code, d.description" in product_cte
+    assert "stock_code COLLATE \"C\"" in sql
