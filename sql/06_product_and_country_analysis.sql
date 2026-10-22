@@ -1,12 +1,13 @@
 -- 06 | Product and country performance, using eligible positive sales lines.
 WITH product_sales AS (
-    SELECT stock_code, MAX(description) AS description,
-           SUM(line_value) AS gross_positive_line_sales_gbp,
-           SUM(quantity) AS positive_units,
-           COUNT(DISTINCT invoice_no) AS invoice_count
-    FROM retailsignal.fact_sales_line
-    WHERE is_positive_sales_line AND stock_code IS NOT NULL
-    GROUP BY stock_code
+    SELECT f.stock_code, MAX(p.description) AS description,
+           SUM(f.line_value) AS gross_positive_line_sales_gbp,
+           SUM(f.quantity) AS positive_units,
+           COUNT(DISTINCT f.invoice_no) AS invoice_count
+    FROM retailsignal.fact_sales_line AS f
+    LEFT JOIN retailsignal.dim_product AS p ON p.stock_code = f.stock_code
+    WHERE f.is_positive_sales_line AND f.stock_code IS NOT NULL
+    GROUP BY f.stock_code
 ), ranked AS (
     SELECT *, SUM(gross_positive_line_sales_gbp) OVER () AS total_sales,
            ROW_NUMBER() OVER (ORDER BY gross_positive_line_sales_gbp DESC, stock_code) AS sales_rank,
