@@ -33,7 +33,7 @@ WITH sales_description_counts AS (
     FROM sales_description_counts
 ), product_sales AS (
     SELECT f.stock_code, d.description,
-           SUM(f.line_value) AS gross_positive_line_sales_gbp,
+           ROUND(SUM(f.line_value), 2) AS gross_positive_line_sales_gbp,
            SUM(f.quantity) AS positive_units,
            COUNT(DISTINCT f.invoice_no) AS invoice_count
     FROM retailsignal.fact_sales_line AS f

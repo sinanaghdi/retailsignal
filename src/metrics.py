@@ -205,7 +205,10 @@ def build_product_performance(lines: pd.DataFrame) -> pd.DataFrame:
         gross_positive_line_sales_gbp=("line_value", "sum"),
         units_sold_positive=("quantity", "sum"),
         invoice_count=("invoice_no", "nunique"),
-    ).sort_values(
+    )
+    # Normalize currency precision before ranking; PostgreSQL aggregates exact NUMERIC values.
+    result["gross_positive_line_sales_gbp"] = result["gross_positive_line_sales_gbp"].round(2)
+    result = result.sort_values(
         ["gross_positive_line_sales_gbp", "stock_code"],
         ascending=[False, True], kind="mergesort"
     ).reset_index(drop=True)
