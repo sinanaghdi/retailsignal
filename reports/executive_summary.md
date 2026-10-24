@@ -1,26 +1,45 @@
-# Executive Summary — Pending Real-Data Execution
+# Executive Summary — RetailSignal
 
-**Status: NOT YET ANALYZED.** The official UCI workbook could not be fetched in the initial build environment. Accordingly, this document contains no numeric business findings or action recommendations. Replace this section only after executing the pipeline and reconciling Python, SQL, and Power BI.
+**Status: Python and PostgreSQL real-data pipeline validated; Power BI dashboard remains pending.**
+
+The official UCI Online Retail II workbook was processed in GitHub Actions. The reproducible run retained all 1,067,371 source rows, generated 15 analytical marts, executed SQL files 02–07 against PostgreSQL 16, and reconciled Python and PostgreSQL totals. The evidence and definitions are in [the real-data benchmark report](real_dataset_benchmark.md).
 
 ## Business question
 
-How can a historical online retailer distinguish changes in recorded sales activity from changes in order volume, identify concentrated product/customer contributions, and assess observed repeat purchasing without overstating the evidence?
+How can a historical online retailer distinguish changes in recorded sales activity from order-volume changes, identify concentrated product/customer contributions, and describe observed repeat purchasing without overstating the evidence?
 
-## Findings
+## Verified descriptive results
 
-| Finding | Evidence reference | Status |
-|---|---|---|
-| Monthly performance and volume drivers | `data/marts/monthly_sales.csv`; `sql/03_sales_analysis.sql` | Pending real data |
-| Product contribution and Pareto concentration | `data/marts/product_performance.csv`; `sql/06_product_and_country_analysis.sql` | Pending real data |
-| Geographic contribution | `data/marts/country_performance.csv`; `sql/06_product_and_country_analysis.sql` | Pending real data |
-| Repeat purchasing, cohorts, and RFM distribution | `data/marts/customer_rfm.csv`, `data/marts/cohort_retention.csv`, `sql/04_customer_analysis.sql`, `sql/05_cohort_analysis.sql` | Pending real data |
-| Negative lines, cancellation-prefix records, missing identifiers, and duplicates | `data/processed/data_quality_audit.csv`; `sql/07_data_quality_checks.sql` | Pending real data |
-| Robustness checks | `data/processed/statistical_checks.json` | Pending real data |
+| Measure | Observed result | Interpretation |
+|---|---:|---|
+| Source rows | 1,067,371 | All rows retained through ingestion and cleaning |
+| Net signed line value | £19,287,250.57 | Sum of recorded line values, including negative values |
+| Gross positive eligible line sales | £20,972,594.57 | Positive quantity, positive price, non-cancellation-prefixed lines |
+| Eligible positive-sales invoices | 40,077 | Distinct invoice IDs with qualifying positive sales |
+| Identified customers in customer analysis | 5,878 | Only records that support customer-level attribution |
+| Repeat purchasers | 4,255 / 5,878 (72.3886%) | At least two eligible purchase invoices within the observed window |
+| Product codes in product mart | 4,916 | Ranking is by code; descriptions may vary within a code |
+| PostgreSQL reconciliation | 7 / 7 checks passed | See the linked CI evidence in the benchmark report |
+| Python real-data acceptance checks | 10 / 10 passed | See the linked CI evidence in the benchmark report |
 
-## Decision implications
+All amounts are recorded transaction-line values in GBP. They are not verified collected cash, recognized accounting revenue, gross margin, or profit.
 
-Do not authorize product investment, retention campaigns, country expansion, or cancellation-policy changes based on this template. After real outputs are generated, each finding must state the population, period, metric definition, query/notebook, practical importance, uncertainty, and the evidence needed to establish whether an action worked.
+## Statistical checks and limits
 
-## Critical information not present in source
+- For matched January–November months in 2010 versus 2011, the paired Wilcoxon test used 11 pairs and returned p = 0.51953125. This does not support a conventional p < 0.05 claim of a difference in those matched monthly observations.
+- Mean positive invoice value per customer differed between one-time and repeat purchasers in this historical sample (medians £232.48 and £300.88; Mann–Whitney p = 1.533525×10⁻³¹; rank-biserial effect 0.1968). This is observational association, not evidence that repeat purchasing causes higher spending.
+- December 2011 is incomplete; later cohorts have unequal follow-up. Missing customer identifiers and conflicting invoice metadata constrain attribution.
 
-The dataset does not support actual profit/margin, customer acquisition cost, marketing return on investment, payment collection, or verified refund/physical-return completion. Those questions require additional cost, campaign, settlement, and operational records.
+## Potential follow-up questions—not business recommendations
+
+After reviewing the detailed product/customer outputs and validating the dashboard, the analysis may help formulate hypotheses about product concentration, observed repeat purchase, and differences by country. Any intervention should be treated as a testable hypothesis, not a proven business action.
+
+## Data not available in this source
+
+The dataset does not establish actual profit/margin, customer acquisition cost, marketing ROI, payment collection, or completed physical returns/refunds. Those require cost, campaign, settlement, and operational records.
+
+## Delivery status
+
+- **Validated:** Python processing, 15 marts, PostgreSQL transformations, row/value reconciliation, and top-product parity in the recorded CI run.
+- **Still pending:** build and visual validation of a Power BI .pbix report. This project does not claim a finished dashboard.
+- **Next engineering checks:** full product-catalog parity between Python and PostgreSQL and atomic staging refresh are being added on branch fix/docs-product-parity-atomic-staging; do not describe those branch changes as validated until its CI completes.

@@ -8,6 +8,14 @@ on:
       - "scripts/check_postgres_reconciliation.py"
       - ".github/workflows/real-data-validation.yml"
       - "requirements.txt"
+  pull_request:
+    paths:
+      - "src/**"
+      - "sql/**"
+      - "scripts/validate_real_dataset.py"
+      - "scripts/check_postgres_reconciliation.py"
+      - ".github/workflows/real-data-validation.yml"
+      - "requirements.txt"
   workflow_dispatch:
 permissions:
   contents: read

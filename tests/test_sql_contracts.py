@@ -1,3 +1,4 @@
+import pandas as pd
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,3 +58,61 @@ def test_product_sql_uses_mode_description_from_positive_sales_lines():
     assert "MAX(p.description)" not in product_cte
     assert "GROUP BY f.stock_code, d.description" in product_cte
     assert "stock_code COLLATE \"C\"" in sql
+
+def test_python_and_sql_product_labels_share_mode_and_deterministic_tie_break():
+    import pandas as pd
+    from src.metrics import _mode_description
+
+    assert _mode_description(pd.Series(["Beta", "Alpha", "Beta", "Alpha"])) == "Alpha"
+    assert _mode_description(pd.Series(["Beta", "Beta", "Alpha"])) == "Beta"
+    assert pd.isna(_mode_description(pd.Series([None, " ", None], dtype="object")))
+
+    sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
+    dimension_sql = (ROOT / "sql" / "02_transformations.sql").read_text(encoding="utf-8")
+    assert 'description_rows DESC, description COLLATE "C" ASC' in sql
+    assert "AND NULLIF(BTRIM(description), '') IS NOT NULL" in dimension_sql
+    assert 'description_rows DESC, description COLLATE "C" ASC' in dimension_sql
+
+
+def test_real_data_reconciliation_compares_full_product_catalog():
+    script = (ROOT / "scripts" / "check_postgres_reconciliation.py").read_text(encoding="utf-8")
+    assert "PRODUCT_PERFORMANCE_SQL" in script
+    assert "def _compare_all_products(" in script
+    assert "LIMIT 10" not in script
+    assert '"product_all_matches_python": bool(product_parity["passed"])' in script
+
+
+def test_staging_refresh_truncate_insert_and_count_share_one_transaction():
+    source = (ROOT / "src" / "load_postgres.py").read_text(encoding="utf-8")
+    transaction = source.split("# Keep TRUNCATE, bulk insert, and reconciliation in one transaction.", 1)[1]
+    transaction = transaction.split('print(f"Loaded and verified', 1)[0]
+    assert transaction.count("with engine.begin() as conn:") == 1
+    assert transaction.index('TRUNCATE TABLE retailsignal.stg_online_retail') < transaction.index('frame.to_sql(')
+    assert transaction.index('frame.to_sql(') < transaction.index('SELECT COUNT(*) FROM retailsignal.stg_online_retail')
+
+def test_full_product_parity_comparison_checks_every_product(tmp_path):
+    from scripts.check_postgres_reconciliation import _compare_all_products
+
+    csv_path = tmp_path / "product_performance.csv"
+    pd.DataFrame([
+        {"stock_code": "A", "description": "Alpha", "gross_positive_line_sales_gbp": 10.0,
+         "units_sold_positive": 1, "invoice_count": 1, "sales_contribution_pct": 33.3333333,
+         "cumulative_contribution_pct": 100.0},
+        {"stock_code": "B", "description": "Beta", "gross_positive_line_sales_gbp": 20.0,
+         "units_sold_positive": 2, "invoice_count": 1, "sales_contribution_pct": 66.6666667,
+         "cumulative_contribution_pct": 66.6666667},
+    ]).to_csv(csv_path, index=False)
+    sql_rows = [
+        ("B", "Beta", 20.0, 2, 1, 66.6666667, 66.6666667),
+        ("A", "Alpha", 10.0, 1, 1, 33.3333333, 100.0),
+    ]
+
+    result = _compare_all_products(sql_rows, csv_path)
+
+    assert result["passed"] is True
+    assert result["matched_products"] == 2
+    assert result["expected_products"] == 2
+    assert result["sql_products"] == 2
+    assert result["compared_fields_per_product"] == 7
+    assert len(result["top_10_sample"]) == 2
+    assert result["mismatches"] == []

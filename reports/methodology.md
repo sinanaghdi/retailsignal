@@ -2,7 +2,9 @@
 
 ## Analysis status
 
-Real-data values remain **pending** until `online_retail_II.xlsx` is downloaded, its schema gate passes, and the reproducible pipeline has run. All thresholds and definitions below are specified before reviewing findings to reduce ad hoc metric switching.
+The official UCI workbook has been executed in GitHub Actions. The recorded run preserved 1,067,371 source rows, generated 15 marts, executed SQL files 02–07 against PostgreSQL 16, and reconciled the main signed and positive-sales totals. See [the real-data benchmark](real_dataset_benchmark.md) for results and run links. The recorded CI also compared the top 10 product rows across seven fields; the separate full-catalog parity check is being added on branch fix/docs-product-parity-atomic-staging and remains pending until that branch's CI passes.
+
+Power BI DAX and visual outputs are not validated because a final .pbix has not been built and checked in Power BI Desktop. Definitions below describe the implemented Python/SQL metrics, not proof of business causality.
 
 ## Grain, source, and currency
 
