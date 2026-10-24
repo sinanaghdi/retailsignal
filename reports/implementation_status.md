@@ -53,7 +53,7 @@ Detailed results, hashes, quality counts, statistical tests, and caveats: [repor
 ## Not executed / not claimed
 
 - No real-data Power BI PBIX was built or verified.
-- The new Power BI preflight has been tested with synthetic fixtures locally, but has not yet been run on a local copy of the full generated UCI exports; the actual PBIX and visual/DAX verification remain a separate Desktop task.
+- The Power BI preflight has passed on the full UCI-generated exports in [CI run 40091630962](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962): 1,067,371 fact rows were checked, the preflight reported GBP 19,287,250.57 net recorded value and GBP 20,972,594.57 eligible positive sales, and a 739-day date dimension was generated. The aggregate-only JSON and date table are in [the run artifact](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962/artifacts/12558834610). This is a CI run rather than a separate local run. The actual PBIX and visual/DAX verification remain a separate Desktop task.
 - The full-catalog comparison, deterministic product-description rule, and transactional staging refresh are merged and validated in [PR #3](https://github.com/sinanaghdi/retailsignal/pull/3) and [real-data CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797883).
 - No business-impact or causal claim is established by these descriptive analyses.
 - The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
