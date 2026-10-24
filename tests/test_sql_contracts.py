@@ -57,3 +57,33 @@ def test_product_sql_uses_mode_description_from_positive_sales_lines():
     assert "MAX(p.description)" not in product_cte
     assert "GROUP BY f.stock_code, d.description" in product_cte
     assert "stock_code COLLATE \"C\"" in sql
+
+def test_python_and_sql_product_labels_share_mode_and_deterministic_tie_break():
+    import pandas as pd
+    from src.metrics import _mode_description
+
+    assert _mode_description(pd.Series(["Beta", "Alpha", "Beta", "Alpha"])) == "Alpha"
+    assert _mode_description(pd.Series(["Beta", "Beta", "Alpha"])) == "Beta"
+    assert pd.isna(_mode_description(pd.Series([None, " ", None], dtype="object")))
+
+    sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
+    dimension_sql = (ROOT / "sql" / "02_transformations.sql").read_text(encoding="utf-8")
+    assert 'description_rows DESC, description COLLATE "C" ASC' in sql
+    assert 'description_rows DESC, description COLLATE "C" ASC NULLS LAST' in dimension_sql
+
+
+def test_real_data_reconciliation_compares_full_product_catalog():
+    script = (ROOT / "scripts" / "check_postgres_reconciliation.py").read_text(encoding="utf-8")
+    assert "PRODUCT_PERFORMANCE_SQL" in script
+    assert "def _compare_all_products(" in script
+    assert "LIMIT 10" not in script
+    assert '"product_all_matches_python": bool(product_parity["passed"])' in script
+
+
+def test_staging_refresh_truncate_insert_and_count_share_one_transaction():
+    source = (ROOT / "src" / "load_postgres.py").read_text(encoding="utf-8")
+    transaction = source.split("# Keep TRUNCATE, bulk insert, and reconciliation in one transaction.", 1)[1]
+    transaction = transaction.split('print(f"Loaded and verified', 1)[0]
+    assert transaction.count("with engine.begin() as conn:") == 1
+    assert transaction.index('TRUNCATE TABLE retailsignal.stg_online_retail') < transaction.index('frame.to_sql(')
+    assert transaction.index('frame.to_sql(') < transaction.index('SELECT COUNT(*) FROM retailsignal.stg_online_retail')
