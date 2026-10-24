@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a1000000000000000016",
+  "position": {
+    "x": 810,
+    "y": 145,
+    "z": 0,
+    "width": 446,
+    "height": 500,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomerRFMSummary"
+                    }
+                  },
+                  "Property": "segment"
+                }
+              },
+              "queryRef": "CustomerRFMSummary.segment",
+              "nativeQueryRef": "segment"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomerRFMSummary"
+                    }
+                  },
+                  "Property": "customers"
+                }
+              },
+              "queryRef": "CustomerRFMSummary.customers",
+              "nativeQueryRef": "customers"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomerRFMSummary"
+                    }
+                  },
+                  "Property": "segment_share_pct"
+                }
+              },
+              "queryRef": "CustomerRFMSummary.segment_share_pct",
+              "nativeQueryRef": "segment_share_pct"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomerRFMSummary"
+                    }
+                  },
+                  "Property": "median_recency_days"
+                }
+              },
+              "queryRef": "CustomerRFMSummary.median_recency_days",
+              "nativeQueryRef": "median_recency_days"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomerRFMSummary"
+                    }
+                  },
+                  "Property": "median_frequency_invoices"
+                }
+              },
+              "queryRef": "CustomerRFMSummary.median_frequency_invoices",
+              "nativeQueryRef": "median_frequency_invoices"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Rule-Based RFM Segments — Full-Window Mart'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

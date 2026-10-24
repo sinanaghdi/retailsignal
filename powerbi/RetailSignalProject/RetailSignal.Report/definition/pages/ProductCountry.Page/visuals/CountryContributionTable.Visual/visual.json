@@ -1,0 +1,115 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a1000000000000000021",
+  "position": {
+    "x": 650,
+    "y": 460,
+    "z": 0,
+    "width": 606,
+    "height": 190,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CountryPerformance"
+                    }
+                  },
+                  "Property": "country"
+                }
+              },
+              "queryRef": "CountryPerformance.country",
+              "nativeQueryRef": "country"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CountryPerformance"
+                    }
+                  },
+                  "Property": "gross_positive_line_sales_gbp"
+                }
+              },
+              "queryRef": "CountryPerformance.gross_positive_line_sales_gbp",
+              "nativeQueryRef": "gross_positive_line_sales_gbp"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CountryPerformance"
+                    }
+                  },
+                  "Property": "invoice_count"
+                }
+              },
+              "queryRef": "CountryPerformance.invoice_count",
+              "nativeQueryRef": "invoice_count"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CountryPerformance"
+                    }
+                  },
+                  "Property": "sales_contribution_pct"
+                }
+              },
+              "queryRef": "CountryPerformance.sales_contribution_pct",
+              "nativeQueryRef": "sales_contribution_pct"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Country Contribution Detail'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a1000000000000000019",
+  "position": {
+    "x": 650,
+    "y": 135,
+    "z": 0,
+    "width": 606,
+    "height": 300,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimCountry"
+                    }
+                  },
+                  "Property": "country"
+                }
+              },
+              "queryRef": "DimCountry.country",
+              "nativeQueryRef": "country"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactSalesLine"
+                    }
+                  },
+                  "Property": "Top 10 Country Sales GBP"
+                }
+              },
+              "queryRef": "FactSalesLine.Top 10 Country Sales GBP",
+              "nativeQueryRef": "Top 10 Country Sales GBP"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top Countries (dynamic fact measures)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

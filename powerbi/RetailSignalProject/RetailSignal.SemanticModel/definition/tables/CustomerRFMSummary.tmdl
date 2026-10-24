@@ -1,0 +1,80 @@
+table CustomerRFMSummary
+
+	column segment
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column customers
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: customers
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment_share_pct
+		dataType: double
+		formatString: 0.0
+		summarizeBy: sum
+		sourceColumn: segment_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column median_recency_days
+		dataType: double
+		formatString: #,##0.0
+		summarizeBy: sum
+		sourceColumn: median_recency_days
+
+		annotation SummarizationSetBy = Automatic
+
+	column median_frequency_invoices
+		dataType: double
+		formatString: #,##0.0
+		summarizeBy: sum
+		sourceColumn: median_frequency_invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column mean_frequency_invoices
+		dataType: double
+		formatString: #,##0.0
+		summarizeBy: sum
+		sourceColumn: mean_frequency_invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column median_monetary_recorded_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: median_monetary_recorded_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column mean_monetary_recorded_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: mean_monetary_recorded_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CustomerRFMSummary = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ProjectRoot & "/data/marts/customer_rfm_segment_summary.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    SelectedColumns = Table.SelectColumns(PromotedHeaders, {"segment", "customers", "segment_share_pct", "median_recency_days", "median_frequency_invoices", "mean_frequency_invoices", "median_monetary_recorded_gbp", "mean_monetary_recorded_gbp"}, MissingField.Error),
+				    ChangedTypes = Table.TransformColumnTypes(SelectedColumns, {{"segment", type text}, {"customers", Int64.Type}, {"segment_share_pct", type number}, {"median_recency_days", type number}, {"median_frequency_invoices", type number}, {"mean_frequency_invoices", type number}, {"median_monetary_recorded_gbp", type number}, {"mean_monetary_recorded_gbp", type number}}, "en-GB")
+				in
+				    ChangedTypes
+
+	annotation PBI_NavigationStepName = Navigation
+	annotation PBI_ResultType = Table
