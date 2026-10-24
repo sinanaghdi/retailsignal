@@ -182,12 +182,26 @@ def build_cohort_retention(lines: pd.DataFrame) -> pd.DataFrame:
     return activity.rename(columns={"invoice_month": "activity_month"}).sort_values(["cohort_month", "cohort_index"]).reset_index(drop=True)
 
 
+def _mode_description(series: pd.Series) -> object:
+    """Choose the most frequent nonblank label; break ties by Unicode/code-point order.
+
+    PostgreSQL mirrors this rule with COUNT(*) DESC and COLLATE "C" ASC.
+    """
+    labels = series.dropna().astype("string").str.strip()
+    labels = labels.loc[labels.ne("")]
+    if labels.empty:
+        return pd.NA
+    counts = labels.value_counts()
+    max_count = counts.max()
+    return min(count for count, frequency in counts.items() if frequency == max_count)
+
+
 def build_product_performance(lines: pd.DataFrame) -> pd.DataFrame:
     eligible = lines.loc[lines["is_positive_sales_line"] & lines["stock_code"].notna()].copy()
     if eligible.empty:
         return pd.DataFrame(columns=["stock_code", "description", "gross_positive_line_sales_gbp", "units_sold_positive", "invoice_count", "sales_contribution_pct", "cumulative_contribution_pct"])
     result = eligible.groupby("stock_code", as_index=False).agg(
-        description=("description", lambda x: x.dropna().mode().iloc[0] if not x.dropna().mode().empty else pd.NA),
+        description=("description", _mode_description),
         gross_positive_line_sales_gbp=("line_value", "sum"),
         units_sold_positive=("quantity", "sum"),
         invoice_count=("invoice_no", "nunique"),
