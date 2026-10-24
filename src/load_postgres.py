@@ -26,12 +26,13 @@ def load_to_staging(input_path: str | Path = DEFAULT_CLEANED, init_schema: bool 
         raise FileNotFoundError(f"Cleaned file not found: {input_path}. Run python -m src.clean first.")
     engine = create_engine(sqlalchemy_url(), pool_pre_ping=True)
     try:
+        if chunk_size < 1:
+            raise ValueError("chunk_size must be a positive integer.")
         with engine.begin() as conn:
             if init_schema:
                 schema_sql = (PROJECT_ROOT / "sql" / "01_schema.sql").read_text(encoding="utf-8")
                 for statement in split_sql_statements(schema_sql):
                     conn.exec_driver_sql(statement)
-            conn.execute(text("TRUNCATE TABLE retailsignal.stg_online_retail"))
         frame = pd.read_csv(input_path, usecols=lambda c: c in BASE_FIELDS, low_memory=False,
                             dtype={"invoice_no": "string", "stock_code": "string", "customer_id": "string", "country": "string", "source_sheet": "string"})
         required = set(BASE_FIELDS) - set(frame.columns)
@@ -43,7 +44,10 @@ def load_to_staging(input_path: str | Path = DEFAULT_CLEANED, init_schema: bool 
         frame["unit_price"] = pd.to_numeric(frame["unit_price"], errors="coerce")
         if frame["is_exact_duplicate_extra_row"].dtype == object:
             frame["is_exact_duplicate_extra_row"] = frame["is_exact_duplicate_extra_row"].astype(str).str.lower().map({"true": True, "false": False}).fillna(False)
+        # Keep TRUNCATE, bulk insert, and reconciliation in one transaction. If insertion
+        # or the row-count check fails, PostgreSQL rolls back and retains the previous staging data.
         with engine.begin() as conn:
+            conn.execute(text("TRUNCATE TABLE retailsignal.stg_online_retail"))
             frame.to_sql("stg_online_retail", conn, schema="retailsignal", if_exists="append", index=False, chunksize=chunk_size)
             result = conn.execute(text("SELECT COUNT(*) FROM retailsignal.stg_online_retail")).scalar_one()
             if result != len(frame):
