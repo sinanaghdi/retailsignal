@@ -11,7 +11,7 @@
 - Row-preserving transaction cleaning, signed line values, defined positive-sale eligibility, customer-attribution ambiguity flags, and 15 generated analytical marts.
 - Python metrics for monthly sales, product/country performance, cancellation/negative-record diagnostics, repeat purchases, cohorts, RFM, customer concentration, duplicate sensitivity, and alternative RFM monetary definitions.
 - PostgreSQL staging schema, fact/dimension model, transformations, analytical queries, reconciliation checks, and Python SQL execution/loading utilities.
-- Three notebooks, five-page Power BI specification, DAX dictionary, interview walkthrough, LinkedIn drafts, case-study outline, and honest resume bullet templates.
+- Three notebooks, five-page Power BI specification, DAX dictionary, local Power BI preflight and Date-table generator, synthetic tests for that utility, interview walkthrough, LinkedIn drafts, case-study outline, and honest resume bullet templates.
 - GitHub Actions unit tests and official-source + PostgreSQL end-to-end workflow.
 
 ## Executed on the official source
@@ -31,28 +31,29 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 
 ## Software tests
 
-- **45 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207). Both jobs report 10 deprecation warnings related to NumPy timedelta unit handling; the warning is being addressed separately.
+- The baseline suite passed **45 tests** on both Python 3.12 and Python 3.13 in [GitHub Actions run 40089797929](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797929); the project-level NumPy timedelta warning no longer appeared. This PR adds four local Power BI preflight test cases; its combined CI result must pass before this addition is considered validated in CI.
 - The new regression test confirms that missing product descriptions are quality defects but do not silently remove otherwise computable financial lines.
 - Regression contracts verify that the SQL product analysis reads source descriptions through source_row_id, selects the most frequent label among eligible positive-sale lines, and orders product ties deterministically.
 
 ## PostgreSQL end-to-end status
 
-**End-to-end validation passed:** [GitHub Actions run 39748609227](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227).
+**End-to-end validation passed:** [GitHub Actions run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227).
 
 - All 1,067,371 source rows were loaded in staging and retained in fact.
 - All SQL files 02–07 executed against PostgreSQL 16.15.
 - Signed totals reconcile: staging and fact both equal GBP 19,287,250.57.
 - Eligible positive line sales reconcile to GBP 20,972,594.57 in Python and PostgreSQL.
 - Positive invoice count matches at 40,077 and no cancellation-prefixed invoice row is classified as positive sales.
-- All 7 PostgreSQL reconciliation checks, all 10 real-data acceptance checks, and full product-catalog parity passed in [GitHub Actions run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209). All **4,916 of 4,916 products** matched Python and PostgreSQL, across the reconciled product fields, with zero mismatches.
+- All 7 PostgreSQL reconciliation checks, all 10 real-data acceptance checks, and full product-catalog parity passed in [GitHub Actions run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209). All **4,916 of 4,916 products** matched Python and PostgreSQL, across the reconciled product fields, with zero mismatches.
 
 The live dataset run exposed product-query and currency-ranking differences. Product descriptions now use the same deterministic mode rule in Python and PostgreSQL, and product sales are rounded to two GBP decimal places before ranking. The latest full-data reconciliation confirms all 4,916 products match with no mismatches. The staging refresh is transactional, so a failed load or row-count check rolls back rather than leaving a partially refreshed staging table.
 
-Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227/artifacts/12412073337).
+Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227/artifacts/12557784399).
 
 ## Not executed / not claimed
 
 - No real-data Power BI PBIX was built or verified.
+- The new Power BI preflight has been tested with synthetic fixtures locally, but has not yet been run on a local copy of the full generated UCI exports; the actual PBIX and visual/DAX verification remain a separate Desktop task.
 - The full-catalog comparison, deterministic product-description rule, and transactional staging refresh are merged and validated in [PR #3](https://github.com/sinanaghdi/retailsignal/pull/3) and [real-data CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209).
 - No business-impact or causal claim is established by these descriptive analyses.
 - The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
