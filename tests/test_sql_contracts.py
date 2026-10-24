@@ -69,7 +69,8 @@ def test_python_and_sql_product_labels_share_mode_and_deterministic_tie_break():
     sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
     dimension_sql = (ROOT / "sql" / "02_transformations.sql").read_text(encoding="utf-8")
     assert 'description_rows DESC, description COLLATE "C" ASC' in sql
-    assert 'description_rows DESC, description COLLATE "C" ASC NULLS LAST' in dimension_sql
+    assert 'AND NULLIF(BTRIM(description), '') IS NOT NULL' in dimension_sql
+    assert 'description_rows DESC, description COLLATE "C" ASC' in dimension_sql
 
 
 def test_real_data_reconciliation_compares_full_product_catalog():
