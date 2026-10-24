@@ -2,7 +2,7 @@
 
 ## Analysis status
 
-The official UCI workbook has been executed in GitHub Actions. The recorded run preserved 1,067,371 source rows, generated 15 marts, executed SQL files 02–07 against PostgreSQL 16, and reconciled the main signed and positive-sales totals. See [the real-data benchmark](real_dataset_benchmark.md) for results and run links. The recorded CI also compared the top 10 product rows across seven fields; the separate full-catalog parity check is being added on branch fix/docs-product-parity-atomic-staging and remains pending until that branch's CI passes.
+The official UCI workbook has been executed in GitHub Actions. The latest recorded run preserved 1,067,371 source rows, generated 15 marts, executed SQL files 02–07 against PostgreSQL 16, reconciled the main signed and positive-sales totals, and matched all 4,916 product rows between Python and PostgreSQL with zero mismatches. See [the real-data benchmark](real_dataset_benchmark.md) and [CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209) for evidence.
 
 Power BI DAX and visual outputs are not validated because a final .pbix has not been built and checked in Power BI Desktop. Definitions below describe the implemented Python/SQL metrics, not proof of business causality.
 
