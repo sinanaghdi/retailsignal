@@ -1,3 +1,4 @@
+import pandas as pd
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,7 +70,7 @@ def test_python_and_sql_product_labels_share_mode_and_deterministic_tie_break():
     sql = (ROOT / "sql" / "06_product_and_country_analysis.sql").read_text(encoding="utf-8")
     dimension_sql = (ROOT / "sql" / "02_transformations.sql").read_text(encoding="utf-8")
     assert 'description_rows DESC, description COLLATE "C" ASC' in sql
-    assert 'AND NULLIF(BTRIM(description), '') IS NOT NULL' in dimension_sql
+    assert "AND NULLIF(BTRIM(description), '') IS NOT NULL" in dimension_sql
     assert 'description_rows DESC, description COLLATE "C" ASC' in dimension_sql
 
 
