@@ -31,7 +31,7 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 
 ## Software tests
 
-- **49 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 40091170579](https://github.com/sinanaghdi/retailsignal/actions/runs/40091170579), including four tests for the local Power BI preflight helper. The project-level NumPy timedelta warning no longer appeared; Node.js deprecation messages from the GitHub Actions runner are toolchain warnings, not Python test failures.
+- **49 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 40091296366](https://github.com/sinanaghdi/retailsignal/actions/runs/40091296366), including four tests for the local Power BI preflight helper. The project-level NumPy timedelta warning no longer appeared; Node.js deprecation messages from the GitHub Actions runner are toolchain warnings, not Python test failures.
 - The new regression test confirms that missing product descriptions are quality defects but do not silently remove otherwise computable financial lines.
 - Regression contracts verify that the SQL product analysis reads source descriptions through source_row_id, selects the most frequent label among eligible positive-sale lines, and orders product ties deterministically.
 
