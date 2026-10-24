@@ -87,3 +87,30 @@ def test_staging_refresh_truncate_insert_and_count_share_one_transaction():
     assert transaction.count("with engine.begin() as conn:") == 1
     assert transaction.index('TRUNCATE TABLE retailsignal.stg_online_retail') < transaction.index('frame.to_sql(')
     assert transaction.index('frame.to_sql(') < transaction.index('SELECT COUNT(*) FROM retailsignal.stg_online_retail')
+
+def test_full_product_parity_comparison_checks_every_product(tmp_path):
+    from scripts.check_postgres_reconciliation import _compare_all_products
+
+    csv_path = tmp_path / "product_performance.csv"
+    pd.DataFrame([
+        {"stock_code": "A", "description": "Alpha", "gross_positive_line_sales_gbp": 10.0,
+         "units_sold_positive": 1, "invoice_count": 1, "sales_contribution_pct": 33.3333333,
+         "cumulative_contribution_pct": 100.0},
+        {"stock_code": "B", "description": "Beta", "gross_positive_line_sales_gbp": 20.0,
+         "units_sold_positive": 2, "invoice_count": 1, "sales_contribution_pct": 66.6666667,
+         "cumulative_contribution_pct": 66.6666667},
+    ]).to_csv(csv_path, index=False)
+    sql_rows = [
+        ("B", "Beta", 20.0, 2, 1, 66.6666667, 66.6666667),
+        ("A", "Alpha", 10.0, 1, 1, 33.3333333, 100.0),
+    ]
+
+    result = _compare_all_products(sql_rows, csv_path)
+
+    assert result["passed"] is True
+    assert result["matched_products"] == 2
+    assert result["expected_products"] == 2
+    assert result["sql_products"] == 2
+    assert result["compared_fields_per_product"] == 7
+    assert len(result["top_10_sample"]) == 2
+    assert result["mismatches"] == []
