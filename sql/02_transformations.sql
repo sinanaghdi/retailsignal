@@ -11,25 +11,29 @@ WHERE NULLIF(BTRIM(customer_id), '') IS NOT NULL;
 -- Match Python's dimension rule: most frequent nonblank description,
 -- with deterministic C-collation ascending order as the tie-breaker.
 INSERT INTO retailsignal.dim_product (stock_code, description, source_line_count)
-WITH description_counts AS (
+WITH product_counts AS (
+    SELECT stock_code, COUNT(*) AS source_line_count
+    FROM retailsignal.stg_online_retail
+    WHERE NULLIF(BTRIM(stock_code), '') IS NOT NULL
+    GROUP BY stock_code
+), description_counts AS (
     SELECT stock_code, NULLIF(BTRIM(description), '') AS description, COUNT(*) AS description_rows
     FROM retailsignal.stg_online_retail
     WHERE NULLIF(BTRIM(stock_code), '') IS NOT NULL
+      AND NULLIF(BTRIM(description), '') IS NOT NULL
     GROUP BY stock_code, NULLIF(BTRIM(description), '')
 ), ranked_descriptions AS (
     SELECT stock_code, description,
            ROW_NUMBER() OVER (
                PARTITION BY stock_code
-               ORDER BY description_rows DESC, description COLLATE "C" ASC NULLS LAST
+               ORDER BY description_rows DESC, description COLLATE "C" ASC
            ) AS label_rank
     FROM description_counts
 )
-SELECT s.stock_code, d.description, COUNT(*)
-FROM retailsignal.stg_online_retail AS s
+SELECT p.stock_code, d.description, p.source_line_count
+FROM product_counts AS p
 LEFT JOIN ranked_descriptions AS d
-  ON d.stock_code = s.stock_code AND d.label_rank = 1
-WHERE NULLIF(BTRIM(s.stock_code), '') IS NOT NULL
-GROUP BY s.stock_code, d.description;
+  ON d.stock_code = p.stock_code AND d.label_rank = 1;
 
 INSERT INTO retailsignal.dim_country (country)
 SELECT DISTINCT NULLIF(BTRIM(country), '')
