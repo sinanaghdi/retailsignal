@@ -53,7 +53,7 @@ Detailed results, hashes, quality counts, statistical tests, and caveats: [repor
 ## Not executed / not claimed
 
 - No real-data Power BI PBIX was built or verified.
-- The branch fix/docs-product-parity-atomic-staging adds a full-catalog Python/PostgreSQL product comparison, tests the deterministic product-description rule, and makes staging refresh transactional. These changes are pending branch CI; update this section with the actual run outcome before merging.
+- The branch fix/docs-product-parity-atomic-staging adds a full-catalog Python/PostgreSQL product comparison, tests the deterministic product-description rule, and makes staging refresh transactional. The latest unit-test workflow attempt was associated with a revision that still reported two test failures; the branch currently contains corrections for the SQL-string assertion and pandas test import. A fresh workflow run must pass before merging.
 - No business-impact or causal claim is established by these descriptive analyses.
 - The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
 - Raw workbook and customer-level files are excluded from public Git. CI artifacts are limited to aggregate metrics, quality summaries, and manifest details.
