@@ -3,9 +3,9 @@
 ## Current implementation and validation status
 
 - The official UCI Online Retail II workbook has been executed in GitHub Actions. The successful recorded run retained all 1,067,371 rows, generated 15 analytical marts, executed SQL files 02–07 against PostgreSQL 16, and reconciled Python/PostgreSQL totals. See [the real-data benchmark](real_dataset_benchmark.md).
-- The recorded Python CI matrix passed 41 tests on each of Python 3.12 and 3.13. The recorded real-data run passed 7 PostgreSQL reconciliation checks and 10 source acceptance checks; its additional product comparison covered the top 10 products across 7 fields each.
+- The latest Python CI matrix passed 45 tests on each of Python 3.12 and 3.13 in [run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207). The latest official-source/PostgreSQL workflow passed in [run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209): 1,067,371 staging rows, 7 reconciliation checks, 10 source acceptance checks, and full product parity (4,916/4,916 products; zero mismatches).
 - The Power BI .pbix file has **not** been built or validated in Power BI Desktop. The repository contains a specification and DAX definitions, not a verified finished dashboard.
-- The branch fix/docs-product-parity-atomic-staging adds full product-catalog parity validation, an explicit product-description tie-break rule, an atomic staging refresh, and related tests. These changes must not be described as passed until the branch CI has completed successfully.
+- Full product-catalog parity, the deterministic product-description rule, and transactional staging refresh are merged and validated. The Python jobs still emit 10 deprecation warnings each related to NumPy timedelta unit handling; these are warnings, not test failures.
 
 ## Analytical limitations inherent to the source
 
