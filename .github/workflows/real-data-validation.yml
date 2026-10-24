@@ -4,6 +4,7 @@ on:
     paths:
       - "src/**"
       - "sql/**"
+      - "powerbi/**"
       - "scripts/validate_real_dataset.py"
       - "scripts/check_postgres_reconciliation.py"
       - ".github/workflows/real-data-validation.yml"
@@ -12,6 +13,7 @@ on:
     paths:
       - "src/**"
       - "sql/**"
+      - "powerbi/**"
       - "scripts/validate_real_dataset.py"
       - "scripts/check_postgres_reconciliation.py"
       - ".github/workflows/real-data-validation.yml"
@@ -52,6 +54,8 @@ jobs:
       - name: Download, ingest, audit, clean and calculate on official UCI data
         # The validation script orchestrates these steps itself; don't run the 1M-row pipeline twice.
         run: python scripts/validate_real_dataset.py --output data/processed/real_dataset_validation.json
+      - name: Preflight Power BI inputs on the official UCI dataset
+        run: python powerbi/prepare_data_model.py
       - name: Load all source rows into PostgreSQL staging
         run: python -m src.load_postgres --init-schema --chunk-size 10000
       - name: Execute PostgreSQL transformation and analytical SQL
@@ -72,6 +76,8 @@ jobs:
             data/processed/postgres_real_data_reconciliation.json
             data/processed/data_quality_audit.csv
             data/processed/statistical_checks.json
+            data/processed/powerbi_model_validation.json
+            data/marts/powerbi_date.csv
             data/raw/source_manifest.json
           if-no-files-found: warn
           retention-days: 14

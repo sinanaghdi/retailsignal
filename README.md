@@ -4,7 +4,7 @@
 
 RetailSignal is a reproducible business analytics case study built around the UCI Machine Learning Repository's **Online Retail II** dataset. It is designed to show how a junior analyst can move from source-data inspection to transparent cleaning rules, reconciled SQL metrics, customer analytics, statistical checks, and an executive-facing Power BI design.
 
-> **Evidence status:** The official UCI Online Retail II workbook has been executed end-to-end in CI: all 1,067,371 source rows were preserved, 15 marts were generated, PostgreSQL 16 SQL executed, and Python/PostgreSQL financial totals reconciled. Full product parity passed: **4,916/4,916 products match with zero mismatches** in [real-data CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209). The Python suite passed 45 tests on each of Python 3.12 and 3.13 in [CI run 40089797929](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207). See [the real-data report](reports/real_dataset_benchmark.md). This historical dataset does not prove current market demand or business impact.
+> **Evidence status:** The official UCI Online Retail II workbook has been executed end-to-end in CI: all 1,067,371 source rows were preserved, 15 marts were generated, PostgreSQL 16 SQL executed, and Python/PostgreSQL financial totals reconciled. Full product parity passed: **4,916/4,916 products match with zero mismatches** in [real-data CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797883). The Python suite passed 49 tests on each of Python 3.12 and 3.13 in [CI run 40091296366](https://github.com/sinanaghdi/retailsignal/actions/runs/40091296366). See [the real-data report](reports/real_dataset_benchmark.md). This historical dataset does not prove current market demand or business impact.
 
 ## Business questions
 
@@ -24,7 +24,7 @@ RetailSignal is a reproducible business analytics case study built around the UC
 - Data marts for monthly performance, products, countries, customers, RFM, and customer cohorts.
 - PostgreSQL staging/star-schema DDL, transformations, reconciliation checks, window-function analysis, retention SQL, and contribution rankings.
 - Unit tests using **clearly synthetic fixtures only**; these are not business data or a substitute for the UCI dataset.
-- Power BI executive dashboard specification, DAX definitions, and a local preflight utility with synthetic-fixture tests. A `.pbix` file has not been created in this environment; follow [`powerbi/LOCAL_BUILD.md`](powerbi/LOCAL_BUILD.md) to prepare and validate the local inputs.
+- Power BI executive dashboard specification, DAX definitions, and a preflight utility with synthetic-fixture tests. The preflight also passed against the full UCI-generated exports in [real-data CI run 40091630962](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962); aggregate-only validation evidence and the generated date table are in [its artifact](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962/artifacts/12558834610). A `.pbix` file has not been created in this environment; follow [`powerbi/LOCAL_BUILD.md`](powerbi/LOCAL_BUILD.md) to prepare and validate local inputs.
 
 ## Dataset and attribution
 
@@ -59,7 +59,7 @@ python -m src.statistics
 python powerbi/prepare_data_model.py
 ```
 
-Project charter and acceptance criteria: [`docs/project_charter.md`](docs/project_charter.md). The latest Python 3.12/3.13 suite passed with 45 tests each in [CI run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207). The real UCI + PostgreSQL end-to-end workflow passed in [CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209), including 7 reconciliation checks, 10 source checks, and full product parity: 4,916/4,916 products matched across the compared fields. Detailed evidence: [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md). Power BI `.pbix` build and visual verification remain pending. Instructions: [`docs/setup.md`](docs/setup.md), [`docs/architecture.md`](docs/architecture.md), and [`powerbi/README.md`](powerbi/README.md).
+Project charter and acceptance criteria: [`docs/project_charter.md`](docs/project_charter.md). The latest Python 3.12/3.13 suite passed with 49 tests each in [CI run 40091296366](https://github.com/sinanaghdi/retailsignal/actions/runs/40091296366). The real UCI + PostgreSQL end-to-end workflow passed in [CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797883), including 7 reconciliation checks, 10 source checks, and full product parity: 4,916/4,916 products matched across the compared fields. Detailed evidence: [`reports/real_dataset_benchmark.md`](reports/real_dataset_benchmark.md). Power BI `.pbix` build and visual verification remain pending. Instructions: [`docs/setup.md`](docs/setup.md), [`docs/architecture.md`](docs/architecture.md), and [`powerbi/README.md`](powerbi/README.md).
 
 ## Pipeline outputs
 
@@ -133,9 +133,9 @@ retailsignal/
 ## Validation status
 
 - **Real source executed:** UCI Online Retail II; 1,067,371 source rows preserved and 15 analytical marts generated. See [the real-data report](reports/real_dataset_benchmark.md).
-- **Automated tests:** 45 tests passed on Python 3.12 and 45 on Python 3.13 in [CI run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207).
-- **End-to-end acceptance:** PostgreSQL 16 staging/fact totals and eligible positive sales reconciled; SQL files 02–07 executed; 7 PostgreSQL checks and 10 source checks passed. Full product parity was verified with 4,916/4,916 rows matched and zero mismatches in [CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209).
-- **Power BI preflight:** `powerbi/prepare_data_model.py` checks local exports, the positive-sales/cancellation rules, amount arithmetic, dimension key uniqueness, monthly-to-fact reconciliation, and generates a contiguous Date table. Its tests use synthetic fixtures; it has not yet been run against local full-data exports in this environment.
+- **Automated tests:** 49 tests passed on Python 3.12 and 49 on Python 3.13 in [CI run 40091296366](https://github.com/sinanaghdi/retailsignal/actions/runs/40091296366).
+- **End-to-end acceptance:** PostgreSQL 16 staging/fact totals and eligible positive sales reconciled; SQL files 02–07 executed; 7 PostgreSQL checks and 10 source checks passed. Full product parity was verified with 4,916/4,916 rows matched and zero mismatches in [CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797883).
+- **Power BI preflight:** `powerbi/prepare_data_model.py` checks required exports and schema, positive-sales/cancellation rules, amount arithmetic, source-row ID integrity, dimension-key uniqueness, monthly-to-fact reconciliation, and generates a contiguous Date table. It passed against all 1,067,371 rows produced in full-data CI run [40091630962](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962); the aggregate-only report and calendar are available in [its artifact](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962/artifacts/12558834610). It has not been run against a separate local copy on this machine.
 - **Still pending:** build and visual verification of the Power BI `.pbix` file in Power BI Desktop. Real-data analysis is descriptive and does not prove causal or commercial impact. See [`powerbi/LOCAL_BUILD.md`](powerbi/LOCAL_BUILD.md).
 
 Do not convert a pending item into a portfolio claim until its evidence has been generated and reviewed. For implementation gaps and release criteria, see [`reports/limitations.md`](reports/limitations.md).
