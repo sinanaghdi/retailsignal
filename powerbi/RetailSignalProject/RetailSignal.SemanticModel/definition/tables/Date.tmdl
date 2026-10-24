@@ -1,0 +1,133 @@
+table Date
+	dataCategory: Time
+
+	column Date
+		dataType: date
+		isKey
+		formatString: yyyy-MM-dd
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column QuarterNumber
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: QuarterNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNumber
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: MonthNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		dataType: string
+		sortByColumn: MonthNumber
+		summarizeBy: none
+		sourceColumn: MonthName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthShort
+		dataType: string
+		sortByColumn: MonthNumber
+		summarizeBy: none
+		sourceColumn: MonthShort
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		sortByColumn: YearMonthKey
+		summarizeBy: none
+		sourceColumn: YearMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonthKey
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: YearMonthKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayOfMonth
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: DayOfMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayOfWeekNumber
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: DayOfWeekNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayOfWeekName
+		dataType: string
+		summarizeBy: none
+		sourceColumn: DayOfWeekName
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsWeekend
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: IsWeekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsFinalObservedMonth
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: IsFinalObservedMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsPartialObservedMonth
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: IsPartialObservedMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ProjectRoot & "/data/marts/powerbi_date.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    SelectedColumns = Table.SelectColumns(PromotedHeaders, {"Date", "Year", "QuarterNumber", "Quarter", "MonthNumber", "MonthName", "MonthShort", "YearMonth", "YearMonthKey", "DayOfMonth", "DayOfWeekNumber", "DayOfWeekName", "IsWeekend", "IsFinalObservedMonth", "IsPartialObservedMonth"}, MissingField.Error),
+				    ChangedTypes = Table.TransformColumnTypes(SelectedColumns, {{"Date", type date}, {"Year", Int64.Type}, {"QuarterNumber", Int64.Type}, {"Quarter", type text}, {"MonthNumber", Int64.Type}, {"MonthName", type text}, {"MonthShort", type text}, {"YearMonth", type text}, {"YearMonthKey", Int64.Type}, {"DayOfMonth", Int64.Type}, {"DayOfWeekNumber", Int64.Type}, {"DayOfWeekName", type text}, {"IsWeekend", type logical}, {"IsFinalObservedMonth", type logical}, {"IsPartialObservedMonth", type logical}}, "en-GB")
+				in
+				    ChangedTypes
+
+	annotation PBI_NavigationStepName = Navigation
+	annotation PBI_ResultType = Table

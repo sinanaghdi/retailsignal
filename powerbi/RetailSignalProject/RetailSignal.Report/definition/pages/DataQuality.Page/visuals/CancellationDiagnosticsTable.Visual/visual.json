@@ -1,0 +1,143 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a1000000000000000027",
+  "position": {
+    "x": 24,
+    "y": 150,
+    "z": 0,
+    "width": 1232,
+    "height": 470,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "diagnostic"
+                }
+              },
+              "queryRef": "CancellationSummary.diagnostic",
+              "nativeQueryRef": "diagnostic"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "rows"
+                }
+              },
+              "queryRef": "CancellationSummary.rows",
+              "nativeQueryRef": "rows"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "invoices"
+                }
+              },
+              "queryRef": "CancellationSummary.invoices",
+              "nativeQueryRef": "invoices"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "signed_line_value_gbp"
+                }
+              },
+              "queryRef": "CancellationSummary.signed_line_value_gbp",
+              "nativeQueryRef": "signed_line_value_gbp"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "absolute_negative_value_gbp"
+                }
+              },
+              "queryRef": "CancellationSummary.absolute_negative_value_gbp",
+              "nativeQueryRef": "absolute_negative_value_gbp"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CancellationSummary"
+                    }
+                  },
+                  "Property": "counts_overlap"
+                }
+              },
+              "queryRef": "CancellationSummary.counts_overlap",
+              "nativeQueryRef": "counts_overlap"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Overlapping Data-Quality Diagnostics'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

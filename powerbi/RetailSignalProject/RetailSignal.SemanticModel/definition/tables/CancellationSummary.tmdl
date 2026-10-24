@@ -1,0 +1,63 @@
+table CancellationSummary
+
+	column diagnostic
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: diagnostic
+
+		annotation SummarizationSetBy = Automatic
+
+	column rows
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: rows
+
+		annotation SummarizationSetBy = Automatic
+
+	column invoices
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column signed_line_value_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: signed_line_value_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column absolute_negative_value_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: absolute_negative_value_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column counts_overlap
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: counts_overlap
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CancellationSummary = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ProjectRoot & "/data/marts/cancellation_summary.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    SelectedColumns = Table.SelectColumns(PromotedHeaders, {"diagnostic", "rows", "invoices", "signed_line_value_gbp", "absolute_negative_value_gbp", "counts_overlap"}, MissingField.Error),
+				    ChangedTypes = Table.TransformColumnTypes(SelectedColumns, {{"diagnostic", type text}, {"rows", Int64.Type}, {"invoices", Int64.Type}, {"signed_line_value_gbp", type number}, {"absolute_negative_value_gbp", type number}, {"counts_overlap", type logical}}, "en-GB")
+				in
+				    ChangedTypes
+
+	annotation PBI_NavigationStepName = Navigation
+	annotation PBI_ResultType = Table

@@ -1,0 +1,11 @@
+relationship 21d76a3c-a6f0-4dca-9e2d-10c8e6a12001
+	fromColumn: FactSalesLine.InvoiceDateDate
+	toColumn: Date.Date
+
+relationship 21d76a3c-a6f0-4dca-9e2d-10c8e6a12002
+	fromColumn: FactSalesLine.stock_code
+	toColumn: DimProduct.stock_code
+
+relationship 21d76a3c-a6f0-4dca-9e2d-10c8e6a12003
+	fromColumn: FactSalesLine.country
+	toColumn: DimCountry.country

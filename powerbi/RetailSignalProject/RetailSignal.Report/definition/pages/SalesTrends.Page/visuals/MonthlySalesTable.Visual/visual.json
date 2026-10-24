@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "a1000000000000000011",
+  "position": {
+    "x": 870,
+    "y": 135,
+    "z": 0,
+    "width": 386,
+    "height": 520,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySales"
+                    }
+                  },
+                  "Property": "month"
+                }
+              },
+              "queryRef": "MonthlySales.month",
+              "nativeQueryRef": "month"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySales"
+                    }
+                  },
+                  "Property": "gross_positive_line_sales_gbp"
+                }
+              },
+              "queryRef": "MonthlySales.gross_positive_line_sales_gbp",
+              "nativeQueryRef": "gross_positive_line_sales_gbp"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySales"
+                    }
+                  },
+                  "Property": "net_recorded_sales_gbp"
+                }
+              },
+              "queryRef": "MonthlySales.net_recorded_sales_gbp",
+              "nativeQueryRef": "net_recorded_sales_gbp"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySales"
+                    }
+                  },
+                  "Property": "sales_invoices"
+                }
+              },
+              "queryRef": "MonthlySales.sales_invoices",
+              "nativeQueryRef": "sales_invoices"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySales"
+                    }
+                  },
+                  "Property": "average_positive_invoice_value_gbp"
+                }
+              },
+              "queryRef": "MonthlySales.average_positive_invoice_value_gbp",
+              "nativeQueryRef": "average_positive_invoice_value_gbp"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Monthly KPI Detail'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

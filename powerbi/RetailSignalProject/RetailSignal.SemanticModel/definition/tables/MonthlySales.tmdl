@@ -1,0 +1,112 @@
+table MonthlySales
+
+	column month
+		dataType: dateTime
+		formatString: yyyy-MM
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column net_recorded_sales_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: net_recorded_sales_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column gross_positive_line_sales_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: gross_positive_line_sales_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column negative_line_value_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: negative_line_value_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	column recorded_invoices
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: recorded_invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales_invoices
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: sales_invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column cancellation_invoices
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: cancellation_invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_count
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		sourceColumn: line_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column mom_net_sales_change_pct
+		dataType: double
+		formatString: 0.0
+		summarizeBy: sum
+		sourceColumn: mom_net_sales_change_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column mom_gross_positive_sales_change_pct
+		dataType: double
+		formatString: 0.0
+		summarizeBy: sum
+		sourceColumn: mom_gross_positive_sales_change_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column mom_sales_invoice_change_pct
+		dataType: double
+		formatString: 0.0
+		summarizeBy: sum
+		sourceColumn: mom_sales_invoice_change_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column average_positive_invoice_value_gbp
+		dataType: double
+		formatString: £#,##0.00;[Red]-£#,##0.00;£0.00
+		summarizeBy: sum
+		sourceColumn: average_positive_invoice_value_gbp
+
+		annotation SummarizationSetBy = Automatic
+
+	partition MonthlySales = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ProjectRoot & "/data/marts/monthly_sales.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    SelectedColumns = Table.SelectColumns(PromotedHeaders, {"month", "net_recorded_sales_gbp", "gross_positive_line_sales_gbp", "negative_line_value_gbp", "recorded_invoices", "sales_invoices", "cancellation_invoices", "line_count", "mom_net_sales_change_pct", "mom_gross_positive_sales_change_pct", "mom_sales_invoice_change_pct", "average_positive_invoice_value_gbp"}, MissingField.Error),
+				    ChangedTypes = Table.TransformColumnTypes(SelectedColumns, {{"month", type datetime}, {"net_recorded_sales_gbp", type number}, {"gross_positive_line_sales_gbp", type number}, {"negative_line_value_gbp", type number}, {"recorded_invoices", Int64.Type}, {"sales_invoices", Int64.Type}, {"cancellation_invoices", Int64.Type}, {"line_count", Int64.Type}, {"mom_net_sales_change_pct", type number}, {"mom_gross_positive_sales_change_pct", type number}, {"mom_sales_invoice_change_pct", type number}, {"average_positive_invoice_value_gbp", type number}}, "en-GB")
+				in
+				    ChangedTypes
+
+	annotation PBI_NavigationStepName = Navigation
+	annotation PBI_ResultType = Table

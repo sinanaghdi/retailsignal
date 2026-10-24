@@ -1,0 +1,27 @@
+model RetailSignal
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parameters
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Tables
+	annotation PBI_QueryGroupOrder = 1
+
+ref table FactSalesLine
+ref table Date
+ref table DimProduct
+ref table DimCountry
+ref table MonthlySales
+ref table ProductPerformance
+ref table CountryPerformance
+ref table CustomerRFMSummary
+ref table CohortRetention
+ref table CancellationSummary
+
+annotation __PBI_TimeIntelligenceEnabled = 0
