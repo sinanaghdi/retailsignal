@@ -1,0 +1,1 @@
+"""Power BI preparation and validation helpers for RetailSignal."""
