@@ -31,7 +31,7 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 
 ## Software tests
 
-- **41 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 39748609139](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609139).
+- **45 tests passed** on Python 3.12 and Python 3.13 in [GitHub Actions run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207). Both jobs report 10 deprecation warnings related to NumPy timedelta unit handling; the warning is being addressed separately.
 - The new regression test confirms that missing product descriptions are quality defects but do not silently remove otherwise computable financial lines.
 - Regression contracts verify that the SQL product analysis reads source descriptions through source_row_id, selects the most frequent label among eligible positive-sale lines, and orders product ties deterministically.
 
@@ -44,16 +44,16 @@ Detailed interpretation and source limitations: [reports/real_dataset_benchmark.
 - Signed totals reconcile: staging and fact both equal GBP 19,287,250.57.
 - Eligible positive line sales reconcile to GBP 20,972,594.57 in Python and PostgreSQL.
 - Positive invoice count matches at 40,077 and no cancellation-prefixed invoice row is classified as positive sales.
-- All 7 PostgreSQL reconciliation checks, all 10 real-data acceptance checks, and the additional top-10 parity check passed. The top 10 products matched Python vs PostgreSQL across 7 fields per product with no mismatches.
+- All 7 PostgreSQL reconciliation checks, all 10 real-data acceptance checks, and full product-catalog parity passed in [GitHub Actions run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209). All **4,916 of 4,916 products** matched Python and PostgreSQL, across the reconciled product fields, with zero mismatches.
 
-The live dataset run exposed two product-query defects: reading description from fact_sales_line (a column that does not exist there) and selecting a label from a generic dimension that could differ from the most frequent description among positive-sale lines. The current query uses source descriptions joined through source_row_id and ranks the mode description; the latest successful real-data acceptance check compared top-10 labels and metrics with Python, with no mismatches. The initial workflow also ran the million-row pipeline twice; that duplicate work has been removed.
+The live dataset run exposed product-query and currency-ranking differences. Product descriptions now use the same deterministic mode rule in Python and PostgreSQL, and product sales are rounded to two GBP decimal places before ranking. The latest full-data reconciliation confirms all 4,916 products match with no mismatches. The staging refresh is transactional, so a failed load or row-count check rolls back rather than leaving a partially refreshed staging table.
 
 Detailed results, hashes, quality counts, statistical tests, and caveats: [reports/real_dataset_benchmark.md](real_dataset_benchmark.md). The aggregate-only CI artifact is [available for 14 days](https://github.com/sinanaghdi/retailsignal/actions/runs/39748609227/artifacts/12412073337).
 
 ## Not executed / not claimed
 
 - No real-data Power BI PBIX was built or verified.
-- The branch fix/docs-product-parity-atomic-staging adds a full-catalog Python/PostgreSQL product comparison, tests the deterministic product-description rule, and makes staging refresh transactional. These changes are pending branch CI; update this section with the actual run outcome before merging.
+- The full-catalog comparison, deterministic product-description rule, and transactional staging refresh are merged and validated in [PR #3](https://github.com/sinanaghdi/retailsignal/pull/3) and [real-data CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209).
 - No business-impact or causal claim is established by these descriptive analyses.
 - The UCI dataset is historical UK retail data; it is not evidence of current Iranian market demand.
 - Raw workbook and customer-level files are excluded from public Git. CI artifacts are limited to aggregate metrics, quality summaries, and manifest details.
