@@ -15,7 +15,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.config import MARTS_DIR
 
 
-PRODUCT_TOP10_SQL = r"""
+PRODUCT_PERFORMANCE_SQL = r"""
 WITH sales_description_counts AS (
     SELECT f.stock_code, NULLIF(BTRIM(s.description), '') AS description, COUNT(*) AS description_rows
     FROM retailsignal.fact_sales_line AS f
@@ -57,8 +57,7 @@ SELECT stock_code, description, gross_positive_line_sales_gbp, positive_units, i
        100.0 * gross_positive_line_sales_gbp / NULLIF(total_sales, 0) AS sales_contribution_pct,
        100.0 * cumulative_sales / NULLIF(total_sales, 0) AS cumulative_contribution_pct
 FROM ranked
-ORDER BY sales_rank
-LIMIT 10;
+ORDER BY sales_rank;
 """
 
 def _same_number(left: object, right: object, *, amount: bool = False) -> bool:
@@ -76,7 +75,7 @@ def _clean_label(value: object) -> str | None:
     text = str(value).strip()
     return text or None
 
-def _compare_product_top10(sql_rows: list[tuple], python_csv: Path) -> dict:
+def _compare_all_products(sql_rows: list[tuple], python_csv: Path) -> dict:
     if not python_csv.exists():
         raise FileNotFoundError(f"Python product mart missing: {python_csv}")
     products = pd.read_csv(python_csv, dtype={"stock_code": "string", "description": "string"})
@@ -89,9 +88,9 @@ def _compare_product_top10(sql_rows: list[tuple], python_csv: Path) -> dict:
     products = products.sort_values(
         ["gross_positive_line_sales_gbp", "stock_code"],
         ascending=[False, True], kind="mergesort"
-    ).head(10).reset_index(drop=True)
+    ).reset_index(drop=True)
     if len(sql_rows) != len(products):
-        return {"passed": False, "matched_products": 0, "expected_products": len(products), "sql_products": len(sql_rows), "mismatches": ["top-10 row count differs"]}
+        return {"passed": False, "matched_products": 0, "expected_products": len(products), "sql_products": len(sql_rows), "compared_fields_per_product": 7, "mismatches": ["full product row count differs"]}
     mismatches = []
     compared = []
     for position, (sql_row, (_, py_row)) in enumerate(zip(sql_rows, products.iterrows()), start=1):
@@ -117,7 +116,7 @@ def _compare_product_top10(sql_rows: list[tuple], python_csv: Path) -> dict:
                          "invoice_count":int(py_row["invoice_count"])})
     return {"passed": not mismatches, "matched_products": len(sql_rows) if not mismatches else len(sql_rows)-len({x["rank"] for x in mismatches}),
             "expected_products": len(products), "sql_products": len(sql_rows), "compared_fields_per_product": 7,
-            "mismatches": mismatches, "top_10_sample": compared}
+            "mismatches": mismatches, "top_10_sample": compared[:10]}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -140,9 +139,9 @@ def main():
             fact_rows, fact_signed, fact_positive, cancellation_positive = cur.fetchone()
             cur.execute("SELECT COUNT(DISTINCT invoice_no) FROM retailsignal.fact_sales_line WHERE is_positive_sales_line AND invoice_no IS NOT NULL")
             invoice_count = cur.fetchone()[0]
-            cur.execute(PRODUCT_TOP10_SQL)
+            cur.execute(PRODUCT_PERFORMANCE_SQL)
             sql_products = cur.fetchall()
-    product_parity = _compare_product_top10(sql_products, MARTS_DIR / "product_performance.csv")
+    product_parity = _compare_all_products(sql_products, MARTS_DIR / "product_performance.csv")
     checks = {
         "staging_row_count_matches": int(staging_rows) == int(summary["source_rows_ingested"]),
         "fact_row_count_matches": int(fact_rows) == int(summary["source_rows_ingested"]),
@@ -151,6 +150,7 @@ def main():
         "fact_positive_amount_matches_python": abs(float(fact_positive) - float(summary["key_metrics"]["gross_positive_eligible_line_sales_gbp"])) <= max(0.02, abs(float(fact_positive))*1e-9),
         "cancellation_rows_never_positive_sales": int(cancellation_positive) == 0,
         "positive_invoice_count_matches_python": int(invoice_count) == int(summary["key_metrics"]["positive_sales_invoices"]),
+        "product_all_matches_python": bool(product_parity["passed"]),
         "product_top10_matches_python": bool(product_parity["passed"]),
     }
     result = {
@@ -161,7 +161,7 @@ def main():
         "positive_fact_gbp": round(float(fact_positive),2),
         "positive_invoice_count": int(invoice_count),
         "cancellation_positive_rows": int(cancellation_positive),
-        "product_top10_parity": product_parity,
+        "product_all_parity": product_parity,
         "checks": checks,
     }
     print(json.dumps(result, indent=2, ensure_ascii=False))
