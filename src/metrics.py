@@ -80,7 +80,7 @@ def build_customer_rfm(lines: pd.DataFrame, observation_date: pd.Timestamp | Non
     if observation_date is None:
         if pd.isna(max_date):
             return pd.DataFrame()
-        observation_date = max_date.normalize() + pd.Timedelta(days=1)
+        observation_date = max_date.normalize() + pd.Timedelta(1, unit="D")
     else:
         observation_date = pd.Timestamp(observation_date).normalize()
     purchase_features = purchases.groupby("customer_id").agg(
