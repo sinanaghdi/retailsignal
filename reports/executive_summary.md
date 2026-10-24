@@ -40,6 +40,6 @@ The dataset does not establish actual profit/margin, customer acquisition cost, 
 
 ## Delivery status
 
-- **Validated:** Python processing, 15 marts, PostgreSQL transformations, row/value reconciliation, and top-product parity in the recorded CI run.
+- **Validated:** Python processing, 15 marts, PostgreSQL transformations, row/value reconciliation, and full product-catalog parity: 4,916/4,916 products match between Python and PostgreSQL in [CI run 40089142209](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142209). The Python test matrix passed 45 tests on each of Python 3.12 and 3.13 in [CI run 40089142207](https://github.com/sinanaghdi/retailsignal/actions/runs/40089142207).
 - **Still pending:** build and visual validation of a Power BI .pbix report. This project does not claim a finished dashboard.
-- **Next engineering checks:** full product-catalog parity between Python and PostgreSQL and atomic staging refresh are being added on branch fix/docs-product-parity-atomic-staging; do not describe those branch changes as validated until its CI completes.
+- **Still pending:** build and visual validation of a Power BI `.pbix` report in Power BI Desktop. The repository contains the dashboard specification and DAX definitions, not a verified finished dashboard.
