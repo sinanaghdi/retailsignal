@@ -193,7 +193,7 @@ def _mode_description(series: pd.Series) -> object:
         return pd.NA
     counts = labels.value_counts()
     max_count = counts.max()
-    return min(count for count, frequency in counts.items() if frequency == max_count)
+    return min(label for label, frequency in counts.items() if frequency == max_count)
 
 
 def build_product_performance(lines: pd.DataFrame) -> pd.DataFrame:
