@@ -2,7 +2,7 @@
 
 > The `.pbix` file is **not** generated in this environment. This specification is designed for implementation and validation in Power BI Desktop after the CSV marts exist.
 
-> For reproducible local CSV preparation and input-level reconciliation, follow [LOCAL_BUILD.md](LOCAL_BUILD.md) before building the report.
+> For reproducible local CSV preparation and input-level reconciliation, follow [LOCAL_BUILD.md](LOCAL_BUILD.md) before building the report. An editable PBIP starter with five report pages is in [RetailSignalProject](RetailSignalProject/README.md); it remains unverified in Power BI Desktop.
 
 ## 1. Recommended model
 

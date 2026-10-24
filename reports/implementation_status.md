@@ -52,7 +52,7 @@ Detailed results, hashes, quality counts, statistical tests, and caveats: [repor
 
 ## Not executed / not claimed
 
-- No real-data Power BI PBIX was built or verified.
+- An editable PBIP source scaffold with a TMDL model and five PBIR report pages has been added under `powerbi/RetailSignalProject/`. Repository-level structural checks cover JSON syntax, model-table references, page IDs, and relationship keys. It has **not** been opened in Power BI Desktop; DAX/TMDL engine validation, actual refresh, visual interaction testing, and saving a final `.pbix` remain outstanding.
 - The Power BI preflight has passed on the full UCI-generated exports in [CI run 40091630962](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962): 1,067,371 fact rows were checked, the preflight reported GBP 19,287,250.57 net recorded value and GBP 20,972,594.57 eligible positive sales, and a 739-day date dimension was generated. The aggregate-only JSON and date table are in [the run artifact](https://github.com/sinanaghdi/retailsignal/actions/runs/40091630962/artifacts/12558834610). This is a CI run rather than a separate local run. The actual PBIX and visual/DAX verification remain a separate Desktop task.
 - The full-catalog comparison, deterministic product-description rule, and transactional staging refresh are merged and validated in [PR #3](https://github.com/sinanaghdi/retailsignal/pull/3) and [real-data CI run 40089797883](https://github.com/sinanaghdi/retailsignal/actions/runs/40089797883).
 - No business-impact or causal claim is established by these descriptive analyses.
